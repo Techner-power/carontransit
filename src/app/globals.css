@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+@import "tailwindcss";
+
+:root {
+  --ink-navy: #0A1F33;
+  --ink-navy-2: #0F2C48;
+  --port-steel: #3D5A73;
+  --manifest-cream: #F5F3EE;
+  --manifest-cream-2: #EDE9DF;
+  --customs-amber: #E8934A;
+  --customs-amber-dark: #C9752F;
+  --verified-teal: #1B7F79;
+  --hairline: rgba(10, 31, 51, 0.12);
+  --hairline-light: rgba(245, 243, 238, 0.18);
+}
+
+@theme inline {
+  --color-ink-navy: var(--ink-navy);
+  --color-ink-navy-2: var(--ink-navy-2);
+  --color-port-steel: var(--port-steel);
+  --color-manifest-cream: var(--manifest-cream);
+  --color-manifest-cream-2: var(--manifest-cream-2);
+  --color-customs-amber: var(--customs-amber);
+  --color-customs-amber-dark: var(--customs-amber-dark);
+  --color-verified-teal: var(--verified-teal);
+  --font-display: "Archivo Expanded", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", -apple-system, Helvetica, sans-serif;
+  --font-mono: "IBM Plex Mono", "Courier New", monospace;
+}
+
+body {
+  background: var(--manifest-cream);
+  color: var(--ink-navy);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.hairline {
+  border-color: var(--hairline);
+}
+
+.hairline-light {
+  border-color: var(--hairline-light);
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.pulse-dot {
+  animation: pulse-dot 1.8s infinite;
+}
