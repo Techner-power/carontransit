@@ -2,6 +2,13 @@ import Link from "next/link";
 import { TransitVehicle } from "@/lib/types";
 import { calculateOnTheRoadPrice, buildDealerWhatsAppLink } from "@/lib/queries";
 
+// Mock data uses placeholder paths like "/vehicles/cx5.jpg" that don't exist
+// on disk. Once real Supabase Storage URLs are pasted in, they'll start
+// with "http", so this tells the difference without needing a flag field.
+function isRealImage(url: string | undefined): boolean {
+  return Boolean(url && url.startsWith("http"));
+}
+
 const statusBadge: Record<string, string> = {
   "On Water": "🔥 On Water",
   Docked: "⚓ Docked",
@@ -16,11 +23,22 @@ export default function TransitCard({ vehicle }: { vehicle: TransitVehicle }) {
   return (
     <div className="bg-white border border-black/[0.12] rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
       <Link href={`/transit/${vehicle.id}`}>
-        <div className="h-[150px] bg-gradient-to-br from-slate-200 to-slate-300 relative flex items-center justify-center text-port-steel text-xs">
+        <div className="h-[150px] relative bg-gradient-to-br from-slate-200 to-slate-300">
+          {isRealImage(vehicle.vehicle_hero_image) ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={vehicle.vehicle_hero_image}
+              alt={vehicle.vehicle_title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-port-steel text-xs">
+              Vehicle photo
+            </div>
+          )}
           <span className="absolute top-3 left-3 bg-customs-amber text-ink-navy text-[10px] font-extrabold px-2.5 py-1 rounded uppercase tracking-wide">
             {statusBadge[vehicle.current_transit_status]}
           </span>
-          Vehicle photo
         </div>
       </Link>
 
@@ -43,7 +61,7 @@ export default function TransitCard({ vehicle }: { vehicle: TransitVehicle }) {
           </span>
         </div>
 
-        <a
+        
           href={whatsappLink}
           target="_blank"
           rel="noopener noreferrer"
