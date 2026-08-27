@@ -21,14 +21,14 @@ export default async function Home() {
             <span className="w-4 h-px bg-customs-amber" /> Live Transit Marketplace · Kenya
           </div>
           <h1 className="text-[36px] sm:text-[52px] leading-[1.02] font-extrabold tracking-tight mb-5">
-            Shika ngeta chako
-            <br />
-            kabla haijagusa <span className="text-customs-amber">ground.</span>
-          </h1>
+  Reserve your car
+  <br />
+  before it hits <span className="text-customs-amber">the ground.</span>
+</h1>
           <p className="text-base leading-relaxed text-manifest-cream/75 max-w-[460px] mb-8">
-            Every car on the water to Mombasa — Vitz, Note, CX-5, Prado — priced, tracked, and ready
-            to book before it clears customs. No broker games. No sending money abroad.
-          </p>
+  Every car en route to Mombasa — Vitz, Note, CX-5, Prado — priced, tracked, and ready
+  to reserve before it clears customs. No broker fees. No sending money abroad.
+</p>
           <div className="flex flex-wrap gap-3.5 mb-11">
             <Link
               href="/transit"
