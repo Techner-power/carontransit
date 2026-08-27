@@ -27,8 +27,19 @@ export default async function ListingDetail({ params }: { params: Promise<{ id: 
 
         <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-10 mt-6">
           <div>
-            <div className="h-[340px] bg-gradient-to-br from-slate-200 to-slate-300 rounded-2xl flex items-center justify-center text-port-steel mb-6">
-              Vehicle photo
+            <div className="h-[340px] rounded-2xl overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 mb-6">
+              {vehicle.vehicle_hero_image?.startsWith("http") ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={vehicle.vehicle_hero_image}
+                  alt={vehicle.vehicle_title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-port-steel">
+                  Vehicle photo
+                </div>
+              )}
             </div>
 
             <h1 className="text-[28px] font-extrabold tracking-tight mb-2">{vehicle.vehicle_title}</h1>
