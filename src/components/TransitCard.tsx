@@ -52,14 +52,16 @@ export default function TransitCard({ vehicle }: { vehicle: TransitVehicle }) {
         <div className="flex justify-between text-[11px] font-mono text-port-steel pb-3 mb-3 border-b border-dashed border-black/[0.12]">
           <span>Chassis ****{vehicle.chassis_masked_identifier}</span>
           <span>{vehicle.vessel_identifier}</span>
-              <div className="flex justify-between items-baseline mb-3.5">
+        </div>
+
+        <div className="flex justify-between items-baseline mb-3.5">
           <span className="text-[11px] text-port-steel">On-The-Road Est.</span>
           <span className="font-mono text-[15px] font-semibold text-verified-teal">
             KES {otrPrice.toLocaleString()}
           </span>
         </div>
 
-        
+        <a
           href={whatsappLink}
           target="_blank"
           rel="noopener noreferrer"
