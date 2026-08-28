@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 
 // Replace with your own WhatsApp number in 254XXXXXXXXX format —
 // this is where dealer signup requests get sent.
-const ADMIN_WHATSAPP_NUMBER = "254700000000";
+const ADMIN_WHATSAPP_NUMBER = "254795490196";
 
 export default function ForDealersPage() {
   const [businessName, setBusinessName] = useState("");
