@@ -10,10 +10,10 @@ function isRealImage(url: string | undefined): boolean {
 }
 
 const statusBadge: Record<string, string> = {
-  "On Water": "🔥 On Water",
-  Docked: "⚓ Docked",
-  Clearing: "🛃 Clearing",
-  "Available at Yard": "✅ At Yard",
+  "On Water": " On Water",
+  Docked: " Docked",
+  Clearing: " Clearing",
+  "Available at Yard": " At Yard",
 };
 
 export default function TransitCard({ vehicle }: { vehicle: TransitVehicle }) {

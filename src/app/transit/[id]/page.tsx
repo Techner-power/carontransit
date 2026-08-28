@@ -129,7 +129,7 @@ export default async function ListingDetail({ params }: { params: Promise<{ id: 
               <h2 className="text-sm font-bold mb-4">Dealer</h2>
               <div className="flex items-center justify-between mb-1">
                 <span className="font-bold text-sm">{vehicle.dealer?.business_name}</span>
-                <span className="text-verified-teal text-xs">✔ KRA Verified</span>
+                <span className="text-verified-teal text-xs"> KRA Verified</span>
               </div>
               <p className="text-[13px] text-port-steel">{vehicle.dealer?.physical_location}</p>
               <p className="text-[13px] text-port-steel mt-1">

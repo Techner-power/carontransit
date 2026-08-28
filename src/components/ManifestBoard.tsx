@@ -12,7 +12,7 @@ export default function ManifestBoard({ rows }: { rows: VesselManifestRow[] }) {
     <div className="bg-ink-navy-2 border border-white/[0.18] rounded-[10px] overflow-hidden">
       <div className="flex items-center justify-between px-4.5 py-3.5 border-b border-white/[0.18]">
         <div className="font-mono text-[11px] tracking-wider uppercase text-customs-amber">
-          ⚓ Manifest Board — Kilindini Channel
+           Manifest Board — Kilindini Channel
         </div>
         <div className="flex items-center gap-1.5 text-[10px] font-mono text-manifest-cream/50">
           <span className="w-1.5 h-1.5 rounded-full bg-customs-amber pulse-dot" /> Live
