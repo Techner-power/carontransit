@@ -32,8 +32,8 @@ export default function TrustSection() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-5">
           {pillars.map((p) => (
             <div key={p.title} className="border border-white/[0.18] rounded-xl p-6.5">
-              <div className="w-9 h-9 rounded-lg bg-customs-amber/[0.15] flex items-center justify-center mb-4 text-customs-amber font-extrabold">
-                {p.icon}
+              <div className="text-customs-amber font-mono text-sm font-bold mb-4">
+  {p.icon}
               </div>
               <h3 className="text-[15px] font-bold mb-2">{p.title}</h3>
               <p className="text-[13px] text-manifest-cream/65 leading-relaxed">{p.desc}</p>
