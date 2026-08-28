@@ -1,13 +1,16 @@
 const pillars = [
   {
+    icon: "01",
     title: "We never touch your money",
     desc: "CarOnTransit is a listing directory. Every payment happens directly between you and the dealer — we hold nothing, and we say so on every page.",
   },
   {
+    icon: "02",
     title: "Chassis-checked listings",
     desc: "Every unit is cross-referenced against shipping manifests before it goes live. We show you the last 4 digits so you can verify it yourself with the dealer.",
   },
   {
+    icon: "03",
     title: "Verified dealer network only",
     desc: "Every dealer on this platform is KRA PIN-verified and has a physical yard you can visit. No anonymous sellers, ever.",
   },
