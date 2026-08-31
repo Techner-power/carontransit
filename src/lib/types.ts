@@ -1,5 +1,10 @@
 export type ShipmentStage = "On Water" | "Docked" | "Clearing" | "Available at Yard";
 
+// Separate from ShipmentStage: this tracks whether the unit is still up for
+// grabs, not where it physically is in transit. A car can be "On Water" and
+// "Reserved" at the same time (buyer has claimed it before it even docks).
+export type ListingStatus = "Active" | "Reserved" | "Sold";
+
 export interface Dealership {
   id: string;
   business_name: string;
@@ -23,6 +28,7 @@ export interface TransitVehicle {
   vessel_identifier: string;
   estimated_arrival_date: string;
   current_transit_status: ShipmentStage;
+  listing_status: ListingStatus;
   chassis_masked_identifier: string;
   vehicle_hero_image: string;
   is_direct_foreign_listing: boolean;

@@ -10,12 +10,13 @@ export interface TransitFilters {
 
 export async function getTransitVehicles(filters: TransitFilters = {}): Promise<TransitVehicle[]> {
   if (!supabase) {
-    return applyMockFilters(mockVehicles, filters);
+    return applyMockFilters(mockVehicles, filters).filter((v) => v.listing_status !== "Sold");
   }
 
   let query = supabase
     .from("transit_inventory")
     .select("*, dealer:dealerships(*)")
+    .neq("listing_status", "Sold")
     .order("estimated_arrival_date", { ascending: true });
 
   if (filters.make) query = query.eq("car_make", filters.make);
@@ -25,7 +26,7 @@ export async function getTransitVehicles(filters: TransitFilters = {}): Promise<
   const { data, error } = await query;
   if (error || !data) {
     console.error("Supabase query failed, falling back to mock data:", error);
-    return applyMockFilters(mockVehicles, filters);
+    return applyMockFilters(mockVehicles, filters).filter((v) => v.listing_status !== "Sold");
   }
   return data as TransitVehicle[];
 }
@@ -110,6 +111,7 @@ export async function getVerifiedDealerCount(): Promise<number> {
   }
   return count;
 }
+
 // Returns every distinct car make actually in the database, sorted alphabetically.
 // This replaces a hardcoded make list, so the Browse filter never falls behind
 // what dealers have actually listed (e.g. a new brand like Subaru shows up

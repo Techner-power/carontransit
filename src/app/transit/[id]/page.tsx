@@ -15,6 +15,8 @@ export default async function ListingDetail({ params }: { params: Promise<{ id: 
   const otrPrice = calculateOnTheRoadPrice(vehicle);
   const whatsappLink = buildDealerWhatsAppLink(vehicle);
   const currentStageIndex = STAGES.indexOf(vehicle.current_transit_status);
+  const isReserved = vehicle.listing_status === "Reserved";
+  const isSold = vehicle.listing_status === "Sold";
   const [vesselsDockingCount, dealerCount] = await Promise.all([
     getVesselsDockingThisWeek(),
     getVerifiedDealerCount(),
@@ -28,6 +30,17 @@ export default async function ListingDetail({ params }: { params: Promise<{ id: 
         <Link href="/transit" className="text-sm text-port-steel">
           ← Back to Browse
         </Link>
+
+        {isSold && (
+          <div className="mt-6 bg-port-steel/[0.1] border border-port-steel/[0.3] rounded-xl p-4 text-sm text-port-steel">
+            This unit has been sold and is no longer available. Browse other units still in transit.
+          </div>
+        )}
+        {isReserved && (
+          <div className="mt-6 bg-customs-amber/[0.1] border border-customs-amber/[0.4] rounded-xl p-4 text-sm text-ink-navy">
+            This unit is currently reserved by another buyer. Contact the dealer to ask about similar units.
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-10 mt-6">
           <div>
@@ -141,14 +154,20 @@ export default async function ListingDetail({ params }: { params: Promise<{ id: 
               </p>
             </div>
 
-            <a
-              href={whatsappLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full bg-[#25D366] hover:bg-[#1ebd55] text-white font-bold text-sm py-4 rounded-xl shadow flex items-center justify-center gap-2"
-            >
-              Text Dealer to Lock This Unit
-            </a>
+            {isReserved || isSold ? (
+              <div className="w-full bg-manifest-cream-2 text-port-steel font-bold text-sm py-4 rounded-xl border border-black/[0.1] flex items-center justify-center gap-2">
+                {isSold ? "This unit has been sold" : "Reserved by another buyer"}
+              </div>
+            ) : (
+              <a
+                href={whatsappLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full bg-[#25D366] hover:bg-[#1ebd55] text-white font-bold text-sm py-4 rounded-xl shadow flex items-center justify-center gap-2"
+              >
+                Text Dealer to Lock This Unit
+              </a>
+            )}
           </div>
         </div>
       </div>

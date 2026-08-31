@@ -5,6 +5,10 @@ create extension if not exists "pgcrypto";
 
 create type shipment_stage as enum ('On Water', 'Docked', 'Clearing', 'Available at Yard');
 
+-- Separate from shipment_stage: tracks whether a unit is still available to
+-- reserve, independent of where it physically is in transit.
+create type listing_status as enum ('Active', 'Reserved', 'Sold');
+
 -- Table 1: Verified Dealerships
 create table dealerships (
     id uuid primary key default gen_random_uuid(),
@@ -30,6 +34,7 @@ create table transit_inventory (
     vessel_identifier varchar(100) not null,
     estimated_arrival_date date not null,
     current_transit_status shipment_stage default 'On Water',
+    listing_status listing_status default 'Active',
     chassis_masked_identifier varchar(5) not null,
     vehicle_hero_image text not null,
     is_direct_foreign_listing boolean default false,

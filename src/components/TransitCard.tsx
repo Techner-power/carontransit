@@ -19,6 +19,7 @@ const statusBadge: Record<string, string> = {
 export default function TransitCard({ vehicle }: { vehicle: TransitVehicle }) {
   const otrPrice = calculateOnTheRoadPrice(vehicle);
   const whatsappLink = buildDealerWhatsAppLink(vehicle);
+  const isReserved = vehicle.listing_status === "Reserved";
 
   return (
     <div className="bg-white border border-black/[0.12] rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
@@ -29,15 +30,19 @@ export default function TransitCard({ vehicle }: { vehicle: TransitVehicle }) {
             <img
               src={vehicle.vehicle_hero_image}
               alt={vehicle.vehicle_title}
-              className="w-full h-full object-cover"
+              className={`w-full h-full object-cover ${isReserved ? "grayscale opacity-70" : ""}`}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-port-steel text-xs">
               Vehicle photo
             </div>
           )}
-          <span className="absolute top-3 left-3 bg-customs-amber text-ink-navy text-[10px] font-extrabold px-2.5 py-1 rounded uppercase tracking-wide">
-            {statusBadge[vehicle.current_transit_status]}
+          <span
+            className={`absolute top-3 left-3 text-[10px] font-extrabold px-2.5 py-1 rounded uppercase tracking-wide ${
+              isReserved ? "bg-port-steel text-white" : "bg-customs-amber text-ink-navy"
+            }`}
+          >
+            {isReserved ? "Reserved" : statusBadge[vehicle.current_transit_status]}
           </span>
         </div>
       </Link>
@@ -61,14 +66,20 @@ export default function TransitCard({ vehicle }: { vehicle: TransitVehicle }) {
           </span>
         </div>
 
-        <a
-          href={whatsappLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full bg-ink-navy text-manifest-cream py-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2"
-        >
-          Text Dealer on WhatsApp
-        </a>
+        {isReserved ? (
+          <div className="w-full bg-manifest-cream-2 text-port-steel py-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2 border border-black/[0.1]">
+            Reserved by another buyer
+          </div>
+        ) : (
+          <a
+            href={whatsappLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full bg-ink-navy text-manifest-cream py-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2"
+          >
+            Text Dealer on WhatsApp
+          </a>
+        )}
       </div>
     </div>
   );
