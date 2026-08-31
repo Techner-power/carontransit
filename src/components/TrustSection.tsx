@@ -33,7 +33,7 @@ export default function TrustSection() {
           {pillars.map((p) => (
             <div key={p.title} className="border border-white/[0.18] rounded-xl p-6.5">
               <div className="text-customs-amber font-mono text-sm font-bold mb-4">
-  {p.icon}
+                {p.icon}
               </div>
               <h3 className="text-[15px] font-bold mb-2">{p.title}</h3>
               <p className="text-[13px] text-manifest-cream/65 leading-relaxed">{p.desc}</p>

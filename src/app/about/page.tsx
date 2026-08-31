@@ -1,10 +1,16 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-export default function AboutPage() {
+import { getVesselsDockingThisWeek, getVerifiedDealerCount } from "@/lib/queries";
+
+export default async function AboutPage() {
+  const [vesselsDockingCount, dealerCount] = await Promise.all([
+    getVesselsDockingThisWeek(),
+    getVerifiedDealerCount(),
+  ]);
   return (
     <>
-      <Header />
+      <Header vesselsDockingCount={vesselsDockingCount} dealerCount={dealerCount} />
       <div className="max-w-[720px] mx-auto px-6 py-16">
         <div className="font-mono text-[11px] font-semibold text-customs-amber-dark uppercase tracking-widest mb-3">
           About

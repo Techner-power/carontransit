@@ -75,3 +75,38 @@ export function buildDealerWhatsAppLink(vehicle: TransitVehicle): string {
   const message = `Hello ${dealer.business_name}, I saw your ${vehicle.vehicle_title} listed as currently in transit on CarOnTransit.co.ke (Stock ID: ****${vehicle.chassis_masked_identifier}). I'm interested in reserving this unit before it arrives at Mombasa. Is it still available, and how do I proceed with a booking deposit?`;
   return `https://wa.me/${dealer.whatsapp_contact}?text=${encodeURIComponent(message)}`;
 }
+
+// Counts distinct vessels with an estimated arrival within the next 7 days —
+// this is the real number behind the top-bar "vessels docking this week" text.
+export async function getVesselsDockingThisWeek(): Promise<number> {
+  const vehicles = await getTransitVehicles();
+  const today = new Date();
+  const weekFromNow = new Date();
+  weekFromNow.setDate(today.getDate() + 7);
+
+  const vesselsThisWeek = new Set(
+    vehicles
+      .filter((v) => {
+        const eta = new Date(v.estimated_arrival_date);
+        return eta >= today && eta <= weekFromNow;
+      })
+      .map((v) => v.vessel_identifier)
+  );
+
+  return vesselsThisWeek.size;
+}
+
+// Real count of dealers in the network, for the "Verified dealer network" line.
+export async function getVerifiedDealerCount(): Promise<number> {
+  if (!supabase) {
+    return new Set(mockVehicles.map((v) => v.dealer_id)).size;
+  }
+  const { count, error } = await supabase
+    .from("dealerships")
+    .select("*", { count: "exact", head: true });
+
+  if (error || count === null) {
+    return new Set(mockVehicles.map((v) => v.dealer_id)).size;
+  }
+  return count;
+}

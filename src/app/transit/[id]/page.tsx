@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { getTransitVehicleById, calculateOnTheRoadPrice, buildDealerWhatsAppLink } from "@/lib/queries";
+import { getTransitVehicleById, calculateOnTheRoadPrice, buildDealerWhatsAppLink, getVesselsDockingThisWeek, getVerifiedDealerCount } from "@/lib/queries";
 import { ShipmentStage } from "@/lib/types";
 
 const STAGES: ShipmentStage[] = ["On Water", "Docked", "Clearing", "Available at Yard"];
@@ -15,10 +15,14 @@ export default async function ListingDetail({ params }: { params: Promise<{ id: 
   const otrPrice = calculateOnTheRoadPrice(vehicle);
   const whatsappLink = buildDealerWhatsAppLink(vehicle);
   const currentStageIndex = STAGES.indexOf(vehicle.current_transit_status);
+  const [vesselsDockingCount, dealerCount] = await Promise.all([
+    getVesselsDockingThisWeek(),
+    getVerifiedDealerCount(),
+  ]);
 
   return (
     <>
-      <Header />
+      <Header vesselsDockingCount={vesselsDockingCount} dealerCount={dealerCount} />
 
       <div className="max-w-[1180px] mx-auto px-6 py-10">
         <Link href="/transit" className="text-sm text-port-steel">
@@ -129,7 +133,7 @@ export default async function ListingDetail({ params }: { params: Promise<{ id: 
               <h2 className="text-sm font-bold mb-4">Dealer</h2>
               <div className="flex items-center justify-between mb-1">
                 <span className="font-bold text-sm">{vehicle.dealer?.business_name}</span>
-                <span className="text-verified-teal text-xs"> KRA Verified</span>
+                <span className="text-verified-teal text-xs">KRA Verified</span>
               </div>
               <p className="text-[13px] text-port-steel">{vehicle.dealer?.physical_location}</p>
               <p className="text-[13px] text-port-steel mt-1">

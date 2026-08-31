@@ -20,10 +20,16 @@ const checks = [
   },
 ];
 
-export default function VerifyPage() {
+import { getVesselsDockingThisWeek, getVerifiedDealerCount } from "@/lib/queries";
+
+export default async function VerifyPage() {
+  const [vesselsDockingCount, dealerCount] = await Promise.all([
+    getVesselsDockingThisWeek(),
+    getVerifiedDealerCount(),
+  ]);
   return (
     <>
-      <Header />
+      <Header vesselsDockingCount={vesselsDockingCount} dealerCount={dealerCount} />
       <div className="max-w-[820px] mx-auto px-6 py-16">
         <div className="font-mono text-[11px] font-semibold text-customs-amber-dark uppercase tracking-widest mb-3">
           Trust & Safety

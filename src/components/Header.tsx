@@ -1,14 +1,31 @@
 import Link from "next/link";
 
-export default function Header() {
+interface HeaderProps {
+  vesselsDockingCount?: number;
+  dealerCount?: number;
+}
+
+export default function Header({ vesselsDockingCount, dealerCount }: HeaderProps) {
+  const vesselLabel =
+    vesselsDockingCount === undefined
+      ? "Live vessel tracking"
+      : vesselsDockingCount === 0
+      ? "No vessels docking this week yet"
+      : `${vesselsDockingCount} vessel${vesselsDockingCount === 1 ? "" : "s"} docking this week`;
+
+  const dealerLabel =
+    dealerCount === undefined
+      ? "Verified dealer network"
+      : `${dealerCount} verified dealer${dealerCount === 1 ? "" : "s"}`;
+
   return (
     <header className="bg-ink-navy text-manifest-cream">
       <div className="flex items-center justify-between px-6 py-2.5 text-xs border-b border-white/[0.12] tracking-wide">
         <div className="flex items-center gap-2.5">
           <span className="w-1.5 h-1.5 rounded-full bg-customs-amber pulse-dot" />
-          3 vessels docking this week · Mombasa Port
+          {vesselLabel} · Mombasa Port
         </div>
-        <div className="opacity-70 hidden sm:block">Verified dealer network · Nairobi</div>
+        <div className="opacity-70 hidden sm:block">{dealerLabel} · Nairobi</div>
       </div>
 
       <nav className="max-w-[1180px] mx-auto flex items-center justify-between px-6 py-5">

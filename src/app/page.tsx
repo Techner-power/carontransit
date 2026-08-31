@@ -5,15 +5,20 @@ import ManifestBoard from "@/components/ManifestBoard";
 import TransitCard from "@/components/TransitCard";
 import HowItWorks from "@/components/HowItWorks";
 import TrustSection from "@/components/TrustSection";
-import { getTransitVehicles, getManifestBoard } from "@/lib/queries";
+import { getTransitVehicles, getManifestBoard, getVesselsDockingThisWeek, getVerifiedDealerCount } from "@/lib/queries";
 
 export default async function Home() {
-  const [vehicles, manifest] = await Promise.all([getTransitVehicles(), getManifestBoard()]);
+  const [vehicles, manifest, vesselsDockingCount, dealerCount] = await Promise.all([
+    getTransitVehicles(),
+    getManifestBoard(),
+    getVesselsDockingThisWeek(),
+    getVerifiedDealerCount(),
+  ]);
   const preview = vehicles.slice(0, 3);
 
   return (
     <>
-      <Header />
+      <Header vesselsDockingCount={vesselsDockingCount} dealerCount={dealerCount} />
 
       <div className="max-w-[1180px] mx-auto px-6 pt-16 grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-12 items-start bg-ink-navy text-manifest-cream">
         <div>
@@ -21,14 +26,14 @@ export default async function Home() {
             <span className="w-4 h-px bg-customs-amber" /> Live Transit Marketplace · Kenya
           </div>
           <h1 className="text-[36px] sm:text-[52px] leading-[1.02] font-extrabold tracking-tight mb-5">
-  Reserve your car
-  <br />
-  before it hits <span className="text-customs-amber">the ground.</span>
-</h1>
+            Reserve your car
+            <br />
+            before it hits <span className="text-customs-amber">the ground.</span>
+          </h1>
           <p className="text-base leading-relaxed text-manifest-cream/75 max-w-[460px] mb-8">
-  Every car en route to Mombasa — Vitz, Note, CX-5, Prado — priced, tracked, and ready
-  to reserve before it clears customs. No broker fees. No sending money abroad.
-</p>
+            Every car en route to Mombasa — Vitz, Note, CX-5, Prado — priced, tracked, and ready
+            to reserve before it clears customs. No broker fees. No sending money abroad.
+          </p>
           <div className="flex flex-wrap gap-3.5 mb-11">
             <Link
               href="/transit"
@@ -51,7 +56,7 @@ export default async function Home() {
               </div>
             </div>
             <div>
-              <div className="font-display text-[22px] font-extrabold">3</div>
+              <div className="font-display text-[22px] font-extrabold">{dealerCount}</div>
               <div className="text-[11px] text-manifest-cream/55 uppercase tracking-wide mt-0.5">
                 Verified Dealers
               </div>

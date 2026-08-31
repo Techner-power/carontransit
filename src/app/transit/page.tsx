@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TransitCard from "@/components/TransitCard";
-import { getTransitVehicles } from "@/lib/queries";
+import { getTransitVehicles, getVesselsDockingThisWeek, getVerifiedDealerCount } from "@/lib/queries";
 
 const MAKES = ["Toyota", "Mazda", "Nissan", "Honda"];
 const STATUSES = ["On Water", "Docked", "Clearing", "Available at Yard"];
@@ -17,10 +17,14 @@ export default async function BrowsePage({
     status: params.status,
     maxBudget: params.maxBudget ? Number(params.maxBudget) : undefined,
   });
+  const [vesselsDockingCount, dealerCount] = await Promise.all([
+    getVesselsDockingThisWeek(),
+    getVerifiedDealerCount(),
+  ]);
 
   return (
     <>
-      <Header />
+      <Header vesselsDockingCount={vesselsDockingCount} dealerCount={dealerCount} />
 
       <div className="max-w-[1180px] mx-auto px-6 py-12">
         <div className="mb-8">
