@@ -110,3 +110,12 @@ export async function getVerifiedDealerCount(): Promise<number> {
   }
   return count;
 }
+// Returns every distinct car make actually in the database, sorted alphabetically.
+// This replaces a hardcoded make list, so the Browse filter never falls behind
+// what dealers have actually listed (e.g. a new brand like Subaru shows up
+// automatically the moment it's entered, no code change needed).
+export async function getAvailableMakes(): Promise<string[]> {
+  const vehicles = await getTransitVehicles();
+  const makes = new Set(vehicles.map((v) => v.car_make));
+  return Array.from(makes).sort();
+}

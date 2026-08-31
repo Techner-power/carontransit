@@ -1,9 +1,13 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TransitCard from "@/components/TransitCard";
-import { getTransitVehicles, getVesselsDockingThisWeek, getVerifiedDealerCount } from "@/lib/queries";
+import {
+  getTransitVehicles,
+  getVesselsDockingThisWeek,
+  getVerifiedDealerCount,
+  getAvailableMakes,
+} from "@/lib/queries";
 
-const MAKES = ["Toyota", "Mazda", "Nissan", "Honda"];
 const STATUSES = ["On Water", "Docked", "Clearing", "Available at Yard"];
 
 export default async function BrowsePage({
@@ -17,9 +21,10 @@ export default async function BrowsePage({
     status: params.status,
     maxBudget: params.maxBudget ? Number(params.maxBudget) : undefined,
   });
-  const [vesselsDockingCount, dealerCount] = await Promise.all([
+  const [vesselsDockingCount, dealerCount, makes] = await Promise.all([
     getVesselsDockingThisWeek(),
     getVerifiedDealerCount(),
+    getAvailableMakes(),
   ]);
 
   return (
@@ -43,7 +48,7 @@ export default async function BrowsePage({
             className="border border-black/[0.12] rounded-lg px-3 py-2 text-sm bg-manifest-cream"
           >
             <option value="">All Makes</option>
-            {MAKES.map((m) => (
+            {makes.map((m) => (
               <option key={m} value={m}>
                 {m}
               </option>
