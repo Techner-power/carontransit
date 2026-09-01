@@ -1,34 +1,128 @@
 "use server";
 
+import { createServerSupabase } from "./supabase/serverClient";
 import { supabaseAdmin } from "./supabaseAdmin";
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { TransitVehicle } from "./types";
 
 export interface ActionResult {
   success: boolean;
   message: string;
 }
 
-function checkAdminSecret(secret: string): boolean {
-  return secret === process.env.ADMIN_SECRET;
+function isAdminEmail(email: string | undefined): boolean {
+  if (!email) return false;
+  const adminEmails = (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  return adminEmails.includes(email.toLowerCase());
 }
 
+// Every admin action below calls this first — it confirms there's a real,
+// logged-in Supabase session AND that the session's email is on the
+// ADMIN_EMAILS allowlist, before anything touches the service-role client.
+async function requireAdmin() {
+  const supabase = await createServerSupabase();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user || !isAdminEmail(user.email)) {
+    return null;
+  }
+  return user;
+}
+
+export async function adminSignIn(formData: FormData): Promise<ActionResult> {
+  const email = String(formData.get("email") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
+
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+  if (error || !data.user) {
+    return { success: false, message: "Incorrect email or password." };
+  }
+  if (!isAdminEmail(data.user.email)) {
+    await supabase.auth.signOut();
+    return { success: false, message: "This account does not have admin access." };
+  }
+
+  redirect("/admin/dashboard");
+}
+
+export async function adminSignOut() {
+  const supabase = await createServerSupabase();
+  await supabase.auth.signOut();
+  redirect("/admin/login");
+}
+
+export async function getPendingVehicles(): Promise<TransitVehicle[]> {
+  const admin = await requireAdmin();
+  if (!admin || !supabaseAdmin) return [];
+
+  const { data } = await supabaseAdmin
+    .from("transit_inventory")
+    .select("*, dealer:dealerships(*)")
+    .eq("review_status", "Pending")
+    .order("created_at", { ascending: true });
+
+  return (data as TransitVehicle[]) ?? [];
+}
+
+export async function approveVehicle(vehicleId: string): Promise<ActionResult> {
+  const admin = await requireAdmin();
+  if (!admin || !supabaseAdmin) {
+    return { success: false, message: "Not authorized." };
+  }
+
+  const { error } = await supabaseAdmin
+    .from("transit_inventory")
+    .update({ review_status: "Approved" })
+    .eq("id", vehicleId);
+
+  if (error) return { success: false, message: error.message };
+
+  revalidatePath("/admin/dashboard");
+  revalidatePath("/transit");
+  revalidatePath("/");
+  return { success: true, message: "Vehicle approved and now live." };
+}
+
+export async function rejectVehicle(vehicleId: string): Promise<ActionResult> {
+  const admin = await requireAdmin();
+  if (!admin || !supabaseAdmin) {
+    return { success: false, message: "Not authorized." };
+  }
+
+  const { error } = await supabaseAdmin
+    .from("transit_inventory")
+    .update({ review_status: "Rejected" })
+    .eq("id", vehicleId);
+
+  if (error) return { success: false, message: error.message };
+
+  revalidatePath("/admin/dashboard");
+  return { success: true, message: "Vehicle rejected." };
+}
+
+// Admin manually adding a dealer or vehicle directly — same as before, but
+// gated by real login instead of a shared access code. Uses the service
+// role client so it bypasses RLS entirely (admin has full control).
 export async function getDealerOptions(): Promise<{ id: string; business_name: string }[]> {
-  if (!supabaseAdmin) return [];
-  const { data, error } = await supabaseAdmin
-    .from("dealerships")
-    .select("id, business_name")
-    .order("business_name");
-  if (error || !data) return [];
-  return data;
+  const admin = await requireAdmin();
+  if (!admin || !supabaseAdmin) return [];
+
+  const { data } = await supabaseAdmin.from("dealerships").select("id, business_name").order("business_name");
+  return data ?? [];
 }
 
 export async function addDealer(formData: FormData): Promise<ActionResult> {
-  const secret = String(formData.get("adminSecret") ?? "");
-  if (!checkAdminSecret(secret)) {
-    return { success: false, message: "Incorrect access code." };
-  }
-  if (!supabaseAdmin) {
-    return { success: false, message: "Server is not connected to the database yet." };
+  const admin = await requireAdmin();
+  if (!admin || !supabaseAdmin) {
+    return { success: false, message: "Not authorized." };
   }
 
   const businessName = String(formData.get("businessName") ?? "").trim();
@@ -36,15 +130,11 @@ export async function addDealer(formData: FormData): Promise<ActionResult> {
   const kraPin = String(formData.get("kraPin") ?? "").trim();
   const whatsapp = String(formData.get("whatsapp") ?? "").trim();
 
-  // Same validation rules that caused real errors during manual entry today.
   if (!businessName || !location || !kraPin || !whatsapp) {
     return { success: false, message: "All dealer fields are required." };
   }
   if (!/^254\d{9}$/.test(whatsapp)) {
-    return {
-      success: false,
-      message: "WhatsApp number must be in the format 254XXXXXXXXX (12 digits, no +, no leading 0).",
-    };
+    return { success: false, message: "WhatsApp number must be in the format 254XXXXXXXXX." };
   }
 
   const { error } = await supabaseAdmin.from("dealerships").insert({
@@ -54,21 +144,16 @@ export async function addDealer(formData: FormData): Promise<ActionResult> {
     whatsapp_contact: whatsapp,
   });
 
-  if (error) {
-    return { success: false, message: `Could not save dealer: ${error.message}` };
-  }
+  if (error) return { success: false, message: `Could not save dealer: ${error.message}` };
 
-  revalidatePath("/admin");
+  revalidatePath("/admin/dashboard");
   return { success: true, message: `Dealer "${businessName}" added successfully.` };
 }
 
 export async function addVehicle(formData: FormData): Promise<ActionResult> {
-  const secret = String(formData.get("adminSecret") ?? "");
-  if (!checkAdminSecret(secret)) {
-    return { success: false, message: "Incorrect access code." };
-  }
-  if (!supabaseAdmin) {
-    return { success: false, message: "Server is not connected to the database yet." };
+  const admin = await requireAdmin();
+  if (!admin || !supabaseAdmin) {
+    return { success: false, message: "Not authorized." };
   }
 
   const dealerId = String(formData.get("dealerId") ?? "");
@@ -84,40 +169,30 @@ export async function addVehicle(formData: FormData): Promise<ActionResult> {
   const photoUrl = String(formData.get("photoUrl") ?? "").trim();
   const transitStatus = String(formData.get("transitStatus") ?? "On Water");
 
-  // Required fields
   if (!dealerId || !vehicleTitle || !carMake || !carModel || !vessel || !eta || !chassis) {
     return { success: false, message: "Please fill in all required fields." };
   }
-
-  // The exact chassis length error you hit today, caught before it ever reaches Supabase
   if (chassis.length > 5) {
     return {
       success: false,
       message: `Chassis identifier must be 5 characters or fewer (you entered ${chassis.length}).`,
     };
   }
-
   const year = Number(yearRaw);
   const currentYear = new Date().getFullYear();
   if (!year || year < 1990 || year > currentYear + 1) {
     return { success: false, message: `Year must be between 1990 and ${currentYear + 1}.` };
   }
-
   const cif = Number(cifRaw);
   if (!cif || cif <= 0) {
     return { success: false, message: "CIF cost must be a positive number." };
   }
-
   const duty = Number(dutyRaw);
   if (!duty || duty <= 0) {
     return { success: false, message: "Estimated duty must be a positive number." };
   }
-
   if (photoUrl && !photoUrl.startsWith("http")) {
-    return {
-      success: false,
-      message: "Photo URL must start with http — paste the full Supabase Storage public URL.",
-    };
+    return { success: false, message: "Photo URL must start with http." };
   }
 
   const { error } = await supabaseAdmin.from("transit_inventory").insert({
@@ -134,14 +209,13 @@ export async function addVehicle(formData: FormData): Promise<ActionResult> {
     chassis_masked_identifier: chassis,
     vehicle_hero_image: photoUrl || "",
     listing_status: "Active",
+    review_status: "Approved", // admin-added cars are trusted immediately
   });
 
-  if (error) {
-    return { success: false, message: `Could not save vehicle: ${error.message}` };
-  }
+  if (error) return { success: false, message: `Could not save vehicle: ${error.message}` };
 
-  revalidatePath("/admin");
+  revalidatePath("/admin/dashboard");
   revalidatePath("/transit");
   revalidatePath("/");
-  return { success: true, message: `${vehicleTitle} added successfully.` };
+  return { success: true, message: `${vehicleTitle} added and live immediately.` };
 }

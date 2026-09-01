@@ -5,8 +5,11 @@ export type ShipmentStage = "On Water" | "Docked" | "Clearing" | "Available at Y
 // "Reserved" at the same time (buyer has claimed it before it even docks).
 export type ListingStatus = "Active" | "Reserved" | "Sold";
 
+export type ReviewStatus = "Pending" | "Approved" | "Rejected";
+
 export interface Dealership {
   id: string;
+  auth_user_id?: string | null;
   business_name: string;
   physical_location: string;
   kra_pin: string;
@@ -29,6 +32,7 @@ export interface TransitVehicle {
   estimated_arrival_date: string;
   current_transit_status: ShipmentStage;
   listing_status: ListingStatus;
+  review_status: ReviewStatus;
   chassis_masked_identifier: string;
   vehicle_hero_image: string;
   is_direct_foreign_listing: boolean;

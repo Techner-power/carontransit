@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import DealerForm from "@/components/DealerForm";
@@ -50,11 +51,24 @@ export default async function ForDealersPage() {
           we never insert ourselves into the transaction or take a cut.
         </p>
 
+        <div className="bg-ink-navy text-manifest-cream rounded-xl p-7 mb-6 text-center">
+          <h2 className="text-lg font-bold mb-2">Ready to list your own cars?</h2>
+          <p className="text-sm text-manifest-cream/70 mb-5">
+            Create a free dealer account and add your units directly. New listings are reviewed
+            before going live, usually within 24 hours.
+          </p>
+          <Link
+            href="/dealer/signup"
+            className="inline-block bg-customs-amber text-ink-navy font-bold text-sm px-6 py-3 rounded-lg"
+          >
+            Create Dealer Account
+          </Link>
+        </div>
+
         <div className="bg-manifest-cream-2 border border-black/[0.12] rounded-xl p-7">
-          <h2 className="text-lg font-bold mb-2">List your first units</h2>
+          <h2 className="text-lg font-bold mb-2">Prefer to just message us first?</h2>
           <p className="text-sm text-port-steel mb-5">
-            We onboard dealers manually during launch to keep listings verified. Send us your details
-            and we&apos;ll reach out on WhatsApp within 24 hours.
+            Send your details on WhatsApp and we&apos;ll set up your account for you.
           </p>
           <DealerForm />
         </div>

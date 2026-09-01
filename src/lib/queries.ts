@@ -17,6 +17,7 @@ export async function getTransitVehicles(filters: TransitFilters = {}): Promise<
     .from("transit_inventory")
     .select("*, dealer:dealerships(*)")
     .neq("listing_status", "Sold")
+    .eq("review_status", "Approved")
     .order("estimated_arrival_date", { ascending: true });
 
   if (filters.make) query = query.eq("car_make", filters.make);
