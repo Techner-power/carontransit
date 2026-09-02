@@ -26,20 +26,26 @@ export default function ManifestBoard({ rows }: { rows: VesselManifestRow[] }) {
         <span>Units</span>
       </div>
 
-      {rows.map((row) => (
-        <div
-          key={row.vessel_identifier}
-          className="grid grid-cols-[1.6fr_1fr_1fr_0.8fr] px-4.5 py-3 text-xs font-mono text-manifest-cream/85 border-b border-white/[0.06]"
-        >
-          <span>{row.vessel_identifier}</span>
-          <span className="flex items-center gap-1.5 font-semibold">
-            <span className={`w-1.5 h-1.5 rounded-full ${statusColor[row.status]}`} />
-            {row.status}
-          </span>
-          <span>{row.eta_label}</span>
-          <span>{row.unit_count}</span>
+      {rows.length === 0 ? (
+        <div className="px-4.5 py-8 text-center text-[13px] text-manifest-cream/50">
+          No units on the manifest yet — check back soon.
         </div>
-      ))}
+      ) : (
+        rows.map((row) => (
+          <div
+            key={row.vessel_identifier}
+            className="grid grid-cols-[1.6fr_1fr_1fr_0.8fr] px-4.5 py-3 text-xs font-mono text-manifest-cream/85 border-b border-white/[0.06]"
+          >
+            <span>{row.vessel_identifier}</span>
+            <span className="flex items-center gap-1.5 font-semibold">
+              <span className={`w-1.5 h-1.5 rounded-full ${statusColor[row.status]}`} />
+              {row.status}
+            </span>
+            <span>{row.eta_label}</span>
+            <span>{row.unit_count}</span>
+          </div>
+        ))
+      )}
     </div>
   );
 }

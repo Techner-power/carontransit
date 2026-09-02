@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import { mockVehicles, mockManifestBoard } from "./mockData";
+import { mockVehicles } from "./mockData";
 import { TransitVehicle, VesselManifestRow } from "./types";
 
 export interface TransitFilters {
@@ -50,11 +50,61 @@ export async function getTransitVehicleById(id: string): Promise<TransitVehicle 
 }
 
 export async function getManifestBoard(): Promise<VesselManifestRow[]> {
-  // The manifest board is a derived/aggregated view. In production this would
-  // be a Postgres view or RPC grouping transit_inventory by vessel_identifier.
-  // For now it's mock-driven; wire it to a real `vessel_manifest` view once
-  // there's enough live inventory to make the aggregation meaningful.
-  return mockManifestBoard;
+  const vehicles = await getTransitVehicles();
+
+  if (vehicles.length === 0) {
+    return [];
+  }
+
+  // Group real vehicles by vessel, since multiple units can share one ship.
+  const vesselGroups = new Map<string, TransitVehicle[]>();
+  for (const v of vehicles) {
+    const group = vesselGroups.get(v.vessel_identifier) ?? [];
+    group.push(v);
+    vesselGroups.set(v.vessel_identifier, group);
+  }
+
+  const today = new Date();
+
+  const rows: VesselManifestRow[] = Array.from(vesselGroups.entries()).map(([vessel, units]) => {
+    // If units on the same vessel have different transit statuses (unlikely
+    // but possible), show whichever is furthest along — Docked/Clearing
+    // matters more to a buyer than "On Water".
+    const stagePriority: Record<string, number> = {
+      "Available at Yard": 4,
+      Clearing: 3,
+      Docked: 2,
+      "On Water": 1,
+    };
+    const furthestStage = units.reduce((furthest, u) =>
+      stagePriority[u.current_transit_status] > stagePriority[furthest.current_transit_status]
+        ? u
+        : furthest
+    ).current_transit_status;
+
+    const eta = new Date(units[0].estimated_arrival_date);
+    const daysUntilEta = Math.ceil((eta.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    const etaLabel =
+      furthestStage === "Available at Yard"
+        ? "Arrived"
+        : daysUntilEta <= 0
+        ? "Arrived"
+        : `${daysUntilEta} day${daysUntilEta === 1 ? "" : "s"}`;
+
+    return {
+      vessel_identifier: vessel,
+      status: furthestStage as VesselManifestRow["status"],
+      eta_label: etaLabel,
+      unit_count: units.length,
+    };
+  });
+
+  // Soonest-arriving vessels first, most relevant to a buyer browsing now.
+  return rows.sort((a, b) => {
+    const etaA = new Date(vehicles.find((v) => v.vessel_identifier === a.vessel_identifier)!.estimated_arrival_date);
+    const etaB = new Date(vehicles.find((v) => v.vessel_identifier === b.vessel_identifier)!.estimated_arrival_date);
+    return etaA.getTime() - etaB.getTime();
+  });
 }
 
 function applyMockFilters(vehicles: TransitVehicle[], filters: TransitFilters): TransitVehicle[] {
