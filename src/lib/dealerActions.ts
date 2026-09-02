@@ -122,6 +122,7 @@ export async function dealerAddVehicle(formData: FormData): Promise<ActionResult
   const chassis = String(formData.get("chassis") ?? "").trim();
   const photoUrl = String(formData.get("photoUrl") ?? "").trim();
   const transitStatus = String(formData.get("transitStatus") ?? "On Water");
+  const priceHidden = formData.get("priceHidden") === "true";
 
   if (!vehicleTitle || !carMake || !carModel || !vessel || !eta || !chassis) {
     return { success: false, message: "Please fill in all required fields." };
@@ -164,6 +165,7 @@ export async function dealerAddVehicle(formData: FormData): Promise<ActionResult
     vehicle_hero_image: photoUrl || "",
     listing_status: "Active",
     review_status: "Pending", // always starts pending — admin must approve
+    price_hidden: priceHidden,
   });
 
   if (error) {

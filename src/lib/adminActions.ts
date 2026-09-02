@@ -168,6 +168,7 @@ export async function addVehicle(formData: FormData): Promise<ActionResult> {
   const chassis = String(formData.get("chassis") ?? "").trim();
   const photoUrl = String(formData.get("photoUrl") ?? "").trim();
   const transitStatus = String(formData.get("transitStatus") ?? "On Water");
+  const priceHidden = formData.get("priceHidden") === "true";
 
   if (!dealerId || !vehicleTitle || !carMake || !carModel || !vessel || !eta || !chassis) {
     return { success: false, message: "Please fill in all required fields." };
@@ -210,6 +211,7 @@ export async function addVehicle(formData: FormData): Promise<ActionResult> {
     vehicle_hero_image: photoUrl || "",
     listing_status: "Active",
     review_status: "Approved", // admin-added cars are trusted immediately
+    price_hidden: priceHidden,
   });
 
   if (error) return { success: false, message: `Could not save vehicle: ${error.message}` };

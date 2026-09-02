@@ -59,12 +59,21 @@ export default function TransitCard({ vehicle }: { vehicle: TransitVehicle }) {
           <span>{vehicle.vessel_identifier}</span>
         </div>
 
-        <div className="flex justify-between items-baseline mb-3.5">
-          <span className="text-[11px] text-port-steel">On-The-Road Est.</span>
-          <span className="font-mono text-[15px] font-semibold text-verified-teal">
-            KES {otrPrice.toLocaleString()}
-          </span>
-        </div>
+        {vehicle.price_hidden ? (
+          <div className="flex justify-between items-baseline mb-3.5">
+            <span className="text-[11px] text-port-steel">Pricing</span>
+            <span className="font-mono text-[13px] font-semibold text-customs-amber-dark">
+              Message dealer
+            </span>
+          </div>
+        ) : (
+          <div className="flex justify-between items-baseline mb-3.5">
+            <span className="text-[11px] text-port-steel">On-The-Road Est.</span>
+            <span className="font-mono text-[15px] font-semibold text-verified-teal">
+              KES {otrPrice.toLocaleString()}
+            </span>
+          </div>
+        )}
 
         {isReserved ? (
           <div className="w-full bg-manifest-cream-2 text-port-steel py-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2 border border-black/[0.1]">
@@ -77,7 +86,7 @@ export default function TransitCard({ vehicle }: { vehicle: TransitVehicle }) {
             rel="noopener noreferrer"
             className="w-full bg-ink-navy text-manifest-cream py-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2"
           >
-            Text Dealer on WhatsApp
+            {vehicle.price_hidden ? "Get Price on WhatsApp" : "Text Dealer on WhatsApp"}
           </a>
         )}
       </div>

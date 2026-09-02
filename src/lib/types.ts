@@ -33,6 +33,11 @@ export interface TransitVehicle {
   current_transit_status: ShipmentStage;
   listing_status: ListingStatus;
   review_status: ReviewStatus;
+  // When true, the public site hides CIF/duty/OTR figures and shows
+  // "Message dealer for pricing" instead — matches dealers who only
+  // disclose price once a buyer reaches out directly, rather than
+  // publishing it on the listing itself.
+  price_hidden: boolean;
   chassis_masked_identifier: string;
   vehicle_hero_image: string;
   is_direct_foreign_listing: boolean;

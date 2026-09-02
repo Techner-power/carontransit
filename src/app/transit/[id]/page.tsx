@@ -106,41 +106,51 @@ export default async function ListingDetail({ params }: { params: Promise<{ id: 
 
           {/* Sidebar: price + dealer */}
           <div>
-            <div className="bg-white border border-black/[0.12] rounded-xl p-6 mb-5">
-              <h2 className="text-sm font-bold mb-4">Price Breakdown</h2>
-              <div className="space-y-2.5 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-port-steel">CIF Mombasa Price</span>
-                  <span className="font-mono font-semibold">
-                    KES {Number(vehicle.cif_cost_kes).toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-port-steel">Est. KRA Customs Duty</span>
-                  <span className="font-mono font-semibold">
-                    KES {Number(vehicle.kra_duty_estimated).toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-port-steel">Est. Clearing Buffer</span>
-                  <span className="font-mono font-semibold">KES 65,000</span>
-                </div>
-                <div className="flex justify-between pt-3 mt-1 border-t border-dashed border-black/[0.15] text-base">
-                  <span className="font-bold">On-The-Road Est.</span>
-                  <span className="font-mono font-extrabold text-verified-teal">
-                    KES {otrPrice.toLocaleString()}
-                  </span>
-                </div>
+            {vehicle.price_hidden ? (
+              <div className="bg-white border border-black/[0.12] rounded-xl p-6 mb-5">
+                <h2 className="text-sm font-bold mb-3">Pricing</h2>
+                <p className="text-[13px] text-port-steel leading-relaxed">
+                  This dealer shares pricing directly once you reach out — message them on WhatsApp
+                  below to get the full price for this unit.
+                </p>
               </div>
-              <p className="text-[11px] text-port-steel mt-3">
-                All figures are estimates. Confirm final duty with your dealer or a licensed clearing
-                agent. See our{" "}
-                <Link href="/duty-guide" className="underline">
-                  duty guide
-                </Link>
-                .
-              </p>
-            </div>
+            ) : (
+              <div className="bg-white border border-black/[0.12] rounded-xl p-6 mb-5">
+                <h2 className="text-sm font-bold mb-4">Price Breakdown</h2>
+                <div className="space-y-2.5 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-port-steel">CIF Mombasa Price</span>
+                    <span className="font-mono font-semibold">
+                      KES {Number(vehicle.cif_cost_kes).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-port-steel">Est. KRA Customs Duty</span>
+                    <span className="font-mono font-semibold">
+                      KES {Number(vehicle.kra_duty_estimated).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-port-steel">Est. Clearing Buffer</span>
+                    <span className="font-mono font-semibold">KES 65,000</span>
+                  </div>
+                  <div className="flex justify-between pt-3 mt-1 border-t border-dashed border-black/[0.15] text-base">
+                    <span className="font-bold">On-The-Road Est.</span>
+                    <span className="font-mono font-extrabold text-verified-teal">
+                      KES {otrPrice.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+                <p className="text-[11px] text-port-steel mt-3">
+                  All figures are estimates. Confirm final duty with your dealer or a licensed
+                  clearing agent. See our{" "}
+                  <Link href="/duty-guide" className="underline">
+                    duty guide
+                  </Link>
+                  .
+                </p>
+              </div>
+            )}
 
             <div className="bg-white border border-black/[0.12] rounded-xl p-6 mb-5">
               <h2 className="text-sm font-bold mb-4">Dealer</h2>
@@ -165,7 +175,7 @@ export default async function ListingDetail({ params }: { params: Promise<{ id: 
                 rel="noopener noreferrer"
                 className="w-full bg-[#25D366] hover:bg-[#1ebd55] text-white font-bold text-sm py-4 rounded-xl shadow flex items-center justify-center gap-2"
               >
-                Text Dealer to Lock This Unit
+                {vehicle.price_hidden ? "Get Price on WhatsApp" : "Text Dealer to Lock This Unit"}
               </a>
             )}
           </div>

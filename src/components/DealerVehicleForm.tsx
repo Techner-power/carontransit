@@ -93,6 +93,10 @@ export default function DealerVehicleForm() {
           placeholder="Photo URL"
           className="border border-black/[0.15] rounded-lg px-3 py-2.5 text-sm"
         />
+        <label className="flex items-center gap-2 text-[13px] text-port-steel sm:col-span-2">
+          <input type="checkbox" name="priceHidden" value="true" />
+          Hide price publicly — I'll share pricing when a buyer messages me
+        </label>
         <button
           type="submit"
           disabled={isPending}

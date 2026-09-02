@@ -31,7 +31,7 @@ export default async function Home() {
             before it hits <span className="text-customs-amber">the ground.</span>
           </h1>
           <p className="text-base leading-relaxed text-manifest-cream/75 max-w-[460px] mb-8">
-            Every car en route to Mombasa — Vitz, Note, CX-5, Prado — priced, tracked, and ready
+            Every car en route to Mombasa — Vitz, Note, CX-5, Prado — tracked, verified, and ready
             to reserve before it clears customs. No broker fees. No sending money abroad.
           </p>
           <div className="flex flex-wrap gap-3.5 mb-11">

@@ -180,6 +180,10 @@ export default function AdminManualEntryForms() {
               className="border border-black/[0.15] rounded-lg px-3 py-2.5 text-sm"
             />
           </div>
+          <label className="flex items-center gap-2 text-[13px] text-port-steel">
+            <input type="checkbox" name="priceHidden" value="true" />
+            Hide price publicly — buyer must message dealer to get it
+          </label>
           <button
             type="submit"
             disabled={isPending}
