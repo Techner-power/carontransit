@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase/serverClient";
 import { getMyDealerProfile, getMyVehicles, dealerSignOut } from "@/lib/dealerActions";
 import DealerVehicleForm from "@/components/DealerVehicleForm";
+import DealerStatusControl from "@/components/DealerStatusControl";
 
 const statusColor: Record<string, string> = {
   Pending: "bg-customs-amber/[0.15] text-customs-amber-dark",
@@ -63,23 +64,23 @@ export default async function DealerDashboardPage() {
         ) : (
           <div className="space-y-3">
             {vehicles.map((v) => (
-              <div
-                key={v.id}
-                className="bg-white border border-black/[0.12] rounded-xl p-4 flex items-center justify-between"
-              >
-                <div>
-                  <p className="font-bold text-sm">{v.vehicle_title}</p>
-                  <p className="text-[12px] text-port-steel font-mono">
-                    Chassis ****{v.chassis_masked_identifier} · {v.vessel_identifier}
-                  </p>
+              <div key={v.id} className="bg-white border border-black/[0.12] rounded-xl p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-sm">{v.vehicle_title}</p>
+                    <p className="text-[12px] text-port-steel font-mono">
+                      Chassis ****{v.chassis_masked_identifier} · {v.vessel_identifier}
+                    </p>
+                  </div>
+                  <span
+                    className={`text-[11px] font-bold px-2.5 py-1 rounded-full shrink-0 ${
+                      statusColor[v.review_status] ?? ""
+                    }`}
+                  >
+                    {v.review_status}
+                  </span>
                 </div>
-                <span
-                  className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${
-                    statusColor[v.review_status] ?? ""
-                  }`}
-                >
-                  {v.review_status}
-                </span>
+                {v.review_status === "Approved" && <DealerStatusControl vehicle={v} />}
               </div>
             ))}
           </div>

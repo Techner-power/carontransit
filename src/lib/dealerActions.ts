@@ -215,3 +215,44 @@ export async function getMyVehicles() {
     .order("created_at", { ascending: false });
   return data ?? [];
 }
+
+// Lets a dealer update ONLY the transit stage and listing status (e.g. mark
+// a car Docked, or Sold) on their own vehicle. Uses the dealer's own
+// authenticated session, so RLS enforces they can only ever touch rows
+// under their own dealer_id — and this function only ever writes these two
+// fields, never review_status or price, regardless of what's submitted.
+export async function dealerUpdateVehicleStatus(formData: FormData): Promise<ActionResult> {
+  const supabase = await createServerSupabase();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, message: "You must be logged in." };
+  }
+
+  const vehicleId = String(formData.get("vehicleId") ?? "");
+  const transitStatus = String(formData.get("transitStatus") ?? "");
+  const listingStatus = String(formData.get("listingStatus") ?? "");
+
+  if (!vehicleId || !transitStatus || !listingStatus) {
+    return { success: false, message: "Missing status values." };
+  }
+
+  const { error } = await supabase
+    .from("transit_inventory")
+    .update({
+      current_transit_status: transitStatus,
+      listing_status: listingStatus,
+    })
+    .eq("id", vehicleId);
+
+  if (error) {
+    return { success: false, message: `Could not update status: ${error.message}` };
+  }
+
+  revalidatePath("/dealer/dashboard");
+  revalidatePath("/transit");
+  revalidatePath("/");
+  return { success: true, message: "Status updated." };
+}
