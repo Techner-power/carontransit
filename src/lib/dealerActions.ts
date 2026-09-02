@@ -1,6 +1,7 @@
 "use server";
 
 import { createServerSupabase } from "./supabase/serverClient";
+import { supabaseAdmin } from "./supabaseAdmin";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
@@ -42,9 +43,14 @@ export async function dealerSignUp(formData: FormData): Promise<ActionResult> {
   }
 
   // Create the dealership profile linked to this new auth account.
-  // RLS policy "Dealers can insert their own dealership profile" allows this
-  // because auth_user_id matches the just-created session's user id.
-  const { error: dealerError } = await supabase.from("dealerships").insert({
+  // We use the service-role client here (not the RLS-scoped one) because
+  // Supabase's default setting requires email confirmation before a new
+  // signup gets an active session — at this exact moment, auth.uid() may
+  // still be null even though the account was just created, which would
+  // cause the RLS policy to reject the insert. The service role bypasses
+  // that entirely, which is safe here since we're the ones who just
+  // verified authData.user.id came from a real, just-created account.
+  const { error: dealerError } = await supabaseAdmin!.from("dealerships").insert({
     auth_user_id: authData.user.id,
     business_name: businessName,
     physical_location: location,
