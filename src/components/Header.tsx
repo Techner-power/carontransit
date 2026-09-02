@@ -38,12 +38,17 @@ export default function Header({ vesselsDockingCount, dealerCount }: HeaderProps
           <Link href="/for-dealers">For Dealers</Link>
           <Link href="/duty-guide">Duty Guide</Link>
         </div>
-        <Link
-          href="/for-dealers"
-          className="bg-customs-amber text-ink-navy px-4.5 py-2.5 rounded-md font-bold text-[13px]"
-        >
-          List Your Cargo
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/dealer/login" className="text-sm font-medium opacity-85 hidden sm:block">
+            Dealer Login
+          </Link>
+          <Link
+            href="/for-dealers"
+            className="bg-customs-amber text-ink-navy px-4.5 py-2.5 rounded-md font-bold text-[13px]"
+          >
+            List Your Cargo
+          </Link>
+        </div>
       </nav>
     </header>
   );

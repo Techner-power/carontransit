@@ -16,6 +16,7 @@ export default function Footer() {
           <Link href="/transit">Browse Transit</Link>
           <Link href="/verify">Verify a Listing</Link>
           <Link href="/for-dealers">For Dealers</Link>
+          <Link href="/dealer/login">Dealer Login</Link>
           <Link href="/duty-guide">Duty Guide</Link>
           <Link href="/about">About</Link>
           <Link href="/legal">Legal</Link>
