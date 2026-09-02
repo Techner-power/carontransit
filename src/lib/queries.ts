@@ -74,9 +74,7 @@ export function calculateOnTheRoadPrice(vehicle: TransitVehicle): number {
 export function buildDealerWhatsAppLink(vehicle: TransitVehicle): string {
   const dealer = vehicle.dealer;
   if (!dealer) return "#";
-  const message = vehicle.price_hidden
-    ? `Hello ${dealer.business_name}, I saw your ${vehicle.vehicle_title} listed as currently in transit on CarOnTransit.co.ke (Stock ID: ****${vehicle.chassis_masked_identifier}). Could you share the price and let me know if it's still available?`
-    : `Hello ${dealer.business_name}, I saw your ${vehicle.vehicle_title} listed as currently in transit on CarOnTransit.co.ke (Stock ID: ****${vehicle.chassis_masked_identifier}). I'm interested in reserving this unit before it arrives at Mombasa. Is it still available, and how do I proceed with a booking deposit?`;
+  const message = `Hello ${dealer.business_name}, I saw your ${vehicle.vehicle_title} listed as currently in transit on CarOnTransit.co.ke (Stock ID: ****${vehicle.chassis_masked_identifier}). I'm interested in reserving this unit before it arrives at Mombasa. Is it still available, and how do I proceed with a booking deposit?`;
   return `https://wa.me/${dealer.whatsapp_contact}?text=${encodeURIComponent(message)}`;
 }
 

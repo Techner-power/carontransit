@@ -175,7 +175,7 @@ export default async function ListingDetail({ params }: { params: Promise<{ id: 
                 rel="noopener noreferrer"
                 className="w-full bg-[#25D366] hover:bg-[#1ebd55] text-white font-bold text-sm py-4 rounded-xl shadow flex items-center justify-center gap-2"
               >
-                {vehicle.price_hidden ? "Get Price on WhatsApp" : "Text Dealer to Lock This Unit"}
+                Text Dealer to Lock This Unit
               </a>
             )}
           </div>

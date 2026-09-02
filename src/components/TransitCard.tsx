@@ -86,7 +86,7 @@ export default function TransitCard({ vehicle }: { vehicle: TransitVehicle }) {
             rel="noopener noreferrer"
             className="w-full bg-ink-navy text-manifest-cream py-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2"
           >
-            {vehicle.price_hidden ? "Get Price on WhatsApp" : "Text Dealer on WhatsApp"}
+            Text Dealer on WhatsApp
           </a>
         )}
       </div>
