@@ -38,9 +38,9 @@ export default async function DutyGuidePage() {
           How Kenyan vehicle import duty actually works
         </h1>
         <p className="text-port-steel leading-relaxed mb-10">
-          Every listing on CarOnTransit shows an estimated duty figure so you can budget before you
-          commit. Here is what goes into that number — and why it&apos;s always an estimate, never a
-          final invoice.
+          Some listings on CarOnTransit show an estimated price upfront; others say &quot;message
+          dealer for pricing.&quot; Here is what goes into that number either way — and why it&apos;s
+          always an estimate, never a final invoice.
         </p>
 
         <div className="space-y-5 mb-12">
@@ -50,6 +50,17 @@ export default async function DutyGuidePage() {
               <p className="text-[13px] text-port-steel leading-relaxed">{t.def}</p>
             </div>
           ))}
+        </div>
+
+        <div className="bg-white border border-black/[0.12] rounded-xl p-6 mb-6">
+          <h3 className="font-bold text-sm mb-2">Why some listings say &quot;message dealer for pricing&quot;</h3>
+          <p className="text-[13px] text-port-steel leading-relaxed">
+            Duty is only finalized once KRA actually assesses the vehicle at clearance — not before.
+            Some dealers prefer to confirm your unit&apos;s exact figures directly with you rather than
+            publish a number that might change by the time your car lands. This isn&apos;t a lack of
+            transparency — reach out on WhatsApp and they&apos;ll walk you through the real numbers for
+            your specific unit.
+          </p>
         </div>
 
         <div className="bg-ink-navy text-manifest-cream rounded-xl p-6">
