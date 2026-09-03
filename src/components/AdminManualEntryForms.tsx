@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useTransition } from "react";
 import { addDealer, addVehicle, getDealerOptions, ActionResult } from "@/lib/adminActions";
+import PhotoUploadField from "./PhotoUploadField";
 
 const STATUSES = ["On Water", "Docked", "Clearing", "Available at Yard"];
 
@@ -174,12 +175,8 @@ export default function AdminManualEntryForms() {
               placeholder="Chassis (max 5)"
               className="border border-black/[0.15] rounded-lg px-3 py-2.5 text-sm"
             />
-            <input
-              name="photoUrl"
-              placeholder="Photo URL"
-              className="border border-black/[0.15] rounded-lg px-3 py-2.5 text-sm"
-            />
           </div>
+          <PhotoUploadField />
           <label className="flex items-center gap-2 text-[13px] text-port-steel">
             <input type="checkbox" name="priceHidden" value="true" />
             Hide price publicly — buyer must message dealer to get it

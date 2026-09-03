@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { dealerAddVehicle } from "@/lib/dealerActions";
+import PhotoUploadField from "./PhotoUploadField";
 
 const STATUSES = ["On Water", "Docked", "Clearing", "Available at Yard"];
 
@@ -88,11 +89,7 @@ export default function DealerVehicleForm() {
           placeholder="Chassis (max 5 chars)"
           className="border border-black/[0.15] rounded-lg px-3 py-2.5 text-sm"
         />
-        <input
-          name="photoUrl"
-          placeholder="Photo URL"
-          className="border border-black/[0.15] rounded-lg px-3 py-2.5 text-sm"
-        />
+        <PhotoUploadField />
         <label className="flex items-center gap-2 text-[13px] text-port-steel sm:col-span-2">
           <input type="checkbox" name="priceHidden" value="true" />
           Hide price publicly — I'll share pricing when a buyer messages me

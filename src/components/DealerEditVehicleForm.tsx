@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { dealerEditVehicle } from "@/lib/dealerActions";
 import { TransitVehicle } from "@/lib/types";
+import PhotoUploadField from "./PhotoUploadField";
 
 export default function DealerEditVehicleForm({
   vehicle,
@@ -101,12 +102,7 @@ export default function DealerEditVehicleForm({
           placeholder="Chassis (max 5 chars)"
           className="border border-black/[0.15] rounded-lg px-3 py-2.5 text-sm bg-white"
         />
-        <input
-          name="photoUrl"
-          defaultValue={vehicle.vehicle_hero_image}
-          placeholder="Photo URL"
-          className="border border-black/[0.15] rounded-lg px-3 py-2.5 text-sm bg-white"
-        />
+        <PhotoUploadField defaultUrl={vehicle.vehicle_hero_image} />
         <label className="flex items-center gap-2 text-[13px] text-port-steel sm:col-span-2">
           <input type="checkbox" name="priceHidden" value="true" defaultChecked={vehicle.price_hidden} />
           Hide price publicly — buyer must message for it
