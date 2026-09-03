@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import { getTransitVehicleById, calculateOnTheRoadPrice, buildDealerWhatsAppLink, getVesselsDockingThisWeek, getVerifiedDealerCount } from "@/lib/queries";
 import { ShipmentStage } from "@/lib/types";
 
@@ -169,14 +170,13 @@ export default async function ListingDetail({ params }: { params: Promise<{ id: 
                 {isSold ? "This unit has been sold" : "Reserved by another buyer"}
               </div>
             ) : (
-              <a
+              <WhatsAppButton
                 href={whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
+                vehicleId={vehicle.id}
+                dealerId={vehicle.dealer_id}
+                label="Text Dealer to Lock This Unit"
                 className="w-full bg-[#25D366] hover:bg-[#1ebd55] text-white font-bold text-sm py-4 rounded-xl shadow flex items-center justify-center gap-2"
-              >
-                Text Dealer to Lock This Unit
-              </a>
+              />
             )}
           </div>
         </div>

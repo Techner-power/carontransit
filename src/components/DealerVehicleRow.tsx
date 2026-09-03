@@ -32,6 +32,12 @@ export default function DealerVehicleRow({ vehicle }: { vehicle: TransitVehicle 
         </span>
       </div>
 
+      {typeof vehicle.lead_count === "number" && vehicle.review_status === "Approved" && (
+        <p className="text-[12px] text-verified-teal font-semibold mt-2">
+          {vehicle.lead_count} WhatsApp {vehicle.lead_count === 1 ? "click" : "clicks"} so far
+        </p>
+      )}
+
       {vehicle.review_status === "Approved" && <DealerStatusControl vehicle={vehicle} />}
 
       {!isEditing ? (

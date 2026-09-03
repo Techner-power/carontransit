@@ -3,6 +3,7 @@
 import { createServerSupabase } from "./supabase/serverClient";
 import { supabaseAdmin } from "./supabaseAdmin";
 import { redirect } from "next/navigation";
+import { TransitVehicle } from "./types";
 import { revalidatePath } from "next/cache";
 
 export interface ActionResult {
@@ -194,7 +195,7 @@ export async function getMyDealerProfile() {
   return data;
 }
 
-export async function getMyVehicles() {
+export async function getMyVehicles(): Promise<TransitVehicle[]> {
   const supabase = await createServerSupabase();
   const {
     data: { user },
@@ -208,12 +209,22 @@ export async function getMyVehicles() {
     .single();
   if (!dealerRow) return [];
 
+  // "lead_events(count)" asks Supabase to embed a count of related rows in
+  // the lead_events table for each vehicle, in one query rather than N.
   const { data } = await supabase
     .from("transit_inventory")
-    .select("*")
+    .select("*, lead_events(count)")
     .eq("dealer_id", dealerRow.id)
     .order("created_at", { ascending: false });
-  return data ?? [];
+
+  if (!data) return [];
+
+  // Supabase returns the embedded count as lead_events: [{ count: N }] —
+  // flatten that into a plain lead_count number for easy display.
+  return data.map((v) => ({
+    ...v,
+    lead_count: Array.isArray(v.lead_events) ? v.lead_events[0]?.count ?? 0 : 0,
+  })) as TransitVehicle[];
 }
 
 // Lets a dealer update ONLY the transit stage and listing status (e.g. mark

@@ -38,6 +38,10 @@ export interface TransitVehicle {
   // disclose price once a buyer reaches out directly, rather than
   // publishing it on the listing itself.
   price_hidden: boolean;
+  // Only populated on the dealer's own dashboard (via getMyVehicles) — a
+  // count of WhatsApp clicks this listing has generated. Not part of the
+  // database row itself, computed at query time.
+  lead_count?: number;
   chassis_masked_identifier: string;
   vehicle_hero_image: string;
   is_direct_foreign_listing: boolean;

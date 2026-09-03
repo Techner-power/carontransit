@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { TransitVehicle } from "@/lib/types";
 import { calculateOnTheRoadPrice, buildDealerWhatsAppLink } from "@/lib/queries";
+import WhatsAppButton from "./WhatsAppButton";
 
 // Mock data uses placeholder paths like "/vehicles/cx5.jpg" that don't exist
 // on disk. Once real Supabase Storage URLs are pasted in, they'll start
@@ -80,14 +81,13 @@ export default function TransitCard({ vehicle }: { vehicle: TransitVehicle }) {
             Reserved by another buyer
           </div>
         ) : (
-          <a
+          <WhatsAppButton
             href={whatsappLink}
-            target="_blank"
-            rel="noopener noreferrer"
+            vehicleId={vehicle.id}
+            dealerId={vehicle.dealer_id}
+            label="Text Dealer on WhatsApp"
             className="w-full bg-ink-navy text-manifest-cream py-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2"
-          >
-            Text Dealer on WhatsApp
-          </a>
+          />
         )}
       </div>
     </div>
