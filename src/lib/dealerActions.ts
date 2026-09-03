@@ -256,3 +256,101 @@ export async function dealerUpdateVehicleStatus(formData: FormData): Promise<Act
   revalidatePath("/");
   return { success: true, message: "Status updated." };
 }
+
+// Lets a dealer fix a typo or update details on their own vehicle. Because
+// this can change facts you already approved (price, chassis, vessel), it
+// always resets review_status back to Pending — the listing temporarily
+// disappears from the public site until you re-approve the corrected
+// version. This is intentional: it stops a dealer from quietly changing
+// approved facts without you ever seeing the new version.
+export async function dealerEditVehicle(formData: FormData): Promise<ActionResult> {
+  const supabase = await createServerSupabase();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, message: "You must be logged in." };
+  }
+
+  const vehicleId = String(formData.get("vehicleId") ?? "");
+  const vehicleTitle = String(formData.get("vehicleTitle") ?? "").trim();
+  const carMake = String(formData.get("carMake") ?? "").trim();
+  const carModel = String(formData.get("carModel") ?? "").trim();
+  const yearRaw = String(formData.get("year") ?? "");
+  const cifRaw = String(formData.get("cif") ?? "");
+  const dutyRaw = String(formData.get("duty") ?? "");
+  const vessel = String(formData.get("vessel") ?? "").trim();
+  const eta = String(formData.get("eta") ?? "");
+  const chassis = String(formData.get("chassis") ?? "").trim();
+  const photoUrl = String(formData.get("photoUrl") ?? "").trim();
+  const priceHidden = formData.get("priceHidden") === "true";
+
+  if (!vehicleId || !vehicleTitle || !carMake || !carModel || !vessel || !eta || !chassis) {
+    return { success: false, message: "Please fill in all required fields." };
+  }
+  if (chassis.length > 5) {
+    return {
+      success: false,
+      message: `Chassis identifier must be 5 characters or fewer (you entered ${chassis.length}).`,
+    };
+  }
+  const year = Number(yearRaw);
+  const currentYear = new Date().getFullYear();
+  if (!year || year < 1990 || year > currentYear + 1) {
+    return { success: false, message: `Year must be between 1990 and ${currentYear + 1}.` };
+  }
+  const cif = Number(cifRaw);
+  if (!cif || cif <= 0) {
+    return { success: false, message: "CIF cost must be a positive number." };
+  }
+  const duty = Number(dutyRaw);
+  if (!duty || duty <= 0) {
+    return { success: false, message: "Estimated duty must be a positive number." };
+  }
+  if (photoUrl && !photoUrl.startsWith("http")) {
+    return { success: false, message: "Photo URL must be a full http link." };
+  }
+
+  // Confirm this vehicle actually belongs to the logged-in dealer before
+  // touching anything — belt-and-suspenders alongside the RLS policy.
+  const { data: dealerRow } = await supabase
+    .from("dealerships")
+    .select("id")
+    .eq("auth_user_id", user.id)
+    .single();
+  if (!dealerRow) {
+    return { success: false, message: "No dealer profile found for this account." };
+  }
+
+  const { error } = await supabase
+    .from("transit_inventory")
+    .update({
+      vehicle_title: vehicleTitle,
+      car_make: carMake,
+      car_model: carModel,
+      year_of_manufacture: year,
+      cif_cost_kes: cif,
+      kra_duty_estimated: duty,
+      vessel_identifier: vessel,
+      estimated_arrival_date: eta,
+      chassis_masked_identifier: chassis,
+      vehicle_hero_image: photoUrl || "",
+      price_hidden: priceHidden,
+      review_status: "Pending", // any edit needs re-approval
+    })
+    .eq("id", vehicleId)
+    .eq("dealer_id", dealerRow.id);
+
+  if (error) {
+    return { success: false, message: `Could not save changes: ${error.message}` };
+  }
+
+  revalidatePath("/dealer/dashboard");
+  revalidatePath("/transit");
+  revalidatePath("/");
+  return {
+    success: true,
+    message: "Changes saved. This listing is now pending re-approval before it's public again.",
+  };
+}
