@@ -13,7 +13,7 @@ export default function ForeignListingCard({ listing }: { listing: ForeignListin
             className="w-full h-full object-cover"
           />
           <span className="absolute top-3 left-3 bg-ink-navy text-manifest-cream text-[10px] font-extrabold px-2.5 py-1 rounded uppercase tracking-wide">
-            Foreign · {listing.exporter?.country}
+            🌍 Foreign — Not Yet Shipped
           </span>
         </div>
       </Link>

@@ -30,6 +30,20 @@ export default async function ForeignBrowsePage() {
           </p>
         </div>
 
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-10">
+          {[
+            { n: "01", t: "Browse" },
+            { n: "02", t: "Request the car" },
+            { n: "03", t: "We assign an agent" },
+            { n: "04", t: "Agent handles the rest" },
+          ].map((s) => (
+            <div key={s.n} className="bg-white border border-black/[0.12] rounded-lg p-3 text-center">
+              <div className="font-mono text-[11px] text-customs-amber-dark font-bold">{s.n}</div>
+              <div className="text-[13px] font-semibold mt-0.5">{s.t}</div>
+            </div>
+          ))}
+        </div>
+
         {listings.length === 0 ? (
           <div className="text-center py-20 border border-dashed border-black/[0.15] rounded-xl">
             <p className="text-port-steel text-sm">

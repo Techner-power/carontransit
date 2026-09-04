@@ -14,6 +14,7 @@ export default function Footer() {
 
         <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm mt-6">
           <Link href="/transit">Browse Transit</Link>
+          <Link href="/foreign">Foreign Imports</Link>
           <Link href="/verify">Verify a Listing</Link>
           <Link href="/for-dealers">For Dealers</Link>
           <Link href="/dealer/login">Dealer Login</Link>

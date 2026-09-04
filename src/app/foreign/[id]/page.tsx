@@ -4,6 +4,30 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getForeignListingById } from "@/lib/foreignQueries";
 import { getVesselsDockingThisWeek, getVerifiedDealerCount } from "@/lib/queries";
+import { ADMIN_WHATSAPP_NUMBER } from "@/lib/constants";
+
+const STEPS = [
+  {
+    n: "01",
+    title: "Request this car",
+    desc: "Tap the button below to tell us you're interested — this messages our team directly, not the exporter.",
+  },
+  {
+    n: "02",
+    title: "We connect you with an agent",
+    desc: "We match you with a verified local import agent who has a working relationship with this exporter.",
+  },
+  {
+    n: "03",
+    title: "Agent verifies the vehicle",
+    desc: "Your agent checks the car's real condition and confirms details before you commit any money.",
+  },
+  {
+    n: "04",
+    title: "Agent handles shipping & clearing",
+    desc: "From purchase through KRA clearance, your agent manages the import — you deal with one person, not three.",
+  },
+];
 
 export default async function ForeignListingDetail({
   params,
@@ -20,10 +44,8 @@ export default async function ForeignListingDetail({
   if (!listing) notFound();
 
   const exporter = listing.exporter;
-  const whatsappMessage = `Hi ${exporter?.company_name}, I'm interested in the ${listing.vehicle_title} listed on CarOnTransit.co.ke (FOB KES ${Number(listing.fob_price_kes).toLocaleString()}). Can you tell me more, and which local agent in Kenya can help me import it?`;
-  const whatsappLink = exporter
-    ? `https://wa.me/${exporter.contact_whatsapp}?text=${encodeURIComponent(whatsappMessage)}`
-    : "#";
+  const whatsappMessage = `Hi, I'm interested in the ${listing.vehicle_title} listed by ${exporter?.company_name} on CarOnTransit.co.ke (FOB KES ${Number(listing.fob_price_kes).toLocaleString()}, listing ID ${listing.id.slice(0, 8)}). Can you connect me with a verified local agent to help import it?`;
+  const whatsappLink = `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
     <>
@@ -53,16 +75,33 @@ export default async function ForeignListingDetail({
               {listing.year_of_manufacture}
             </p>
 
-            <div className="bg-customs-amber/[0.08] border border-customs-amber/[0.4] rounded-xl p-5">
+            <div className="bg-customs-amber/[0.08] border border-customs-amber/[0.4] rounded-xl p-5 mb-8">
               <h3 className="text-sm font-bold text-ink-navy mb-2">
                 This car is not yet inspected by a Kenyan agent
               </h3>
               <p className="text-[13px] text-port-steel leading-relaxed">
                 Unlike our local transit listings, this vehicle hasn&apos;t shipped yet and no one
-                local has physically checked it. Once you select an import agent, they will verify
-                the vehicle&apos;s condition and handle shipping and customs clearance on your
-                behalf — never send full payment before that verification happens.
+                local has physically checked it. Once you request this car, an agent will verify
+                its condition and handle shipping and customs clearance on your behalf — never send
+                full payment before that verification happens.
               </p>
+            </div>
+
+            <div className="bg-white border border-black/[0.12] rounded-xl p-6">
+              <h2 className="text-sm font-bold mb-5">How importing this car works</h2>
+              <div className="space-y-5">
+                {STEPS.map((step) => (
+                  <div key={step.n} className="flex gap-4">
+                    <div className="font-mono text-customs-amber-dark font-bold text-sm shrink-0">
+                      {step.n}
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold mb-1">{step.title}</h3>
+                      <p className="text-[13px] text-port-steel leading-relaxed">{step.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -86,6 +125,10 @@ export default async function ForeignListingDetail({
               <h2 className="text-sm font-bold mb-4">Exporter</h2>
               <p className="font-bold text-sm mb-1">{exporter?.company_name}</p>
               <p className="text-[13px] text-port-steel">{exporter?.country}</p>
+              <p className="text-[11px] text-port-steel mt-2">
+                You won&apos;t contact this exporter directly — your agent handles that on your
+                behalf.
+              </p>
             </div>
 
             <a
@@ -94,7 +137,7 @@ export default async function ForeignListingDetail({
               rel="noopener noreferrer"
               className="w-full bg-[#25D366] hover:bg-[#1ebd55] text-white font-bold text-sm py-4 rounded-xl shadow flex items-center justify-center gap-2"
             >
-              Express Interest on WhatsApp
+              Request This Car & Get an Agent
             </a>
           </div>
         </div>

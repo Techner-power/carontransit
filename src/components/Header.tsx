@@ -34,6 +34,7 @@ export default function Header({ vesselsDockingCount, dealerCount }: HeaderProps
         </Link>
         <div className="hidden md:flex gap-8 text-sm font-medium opacity-85">
           <Link href="/transit">Browse Transit</Link>
+          <Link href="/foreign">Foreign Imports</Link>
           <Link href="/verify">Verify a Listing</Link>
           <Link href="/for-dealers">For Dealers</Link>
           <Link href="/duty-guide">Duty Guide</Link>

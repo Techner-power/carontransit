@@ -1,10 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-// Replace with your own WhatsApp number in 254XXXXXXXXX format —
-// this is where dealer signup requests get sent.
-const ADMIN_WHATSAPP_NUMBER = "254795490196";
+import { ADMIN_WHATSAPP_NUMBER } from "@/lib/constants";
 
 export default function DealerForm() {
   const [businessName, setBusinessName] = useState("");
