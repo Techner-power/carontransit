@@ -19,6 +19,19 @@ export interface Dealership {
   created_at: string;
 }
 
+// Foreign exporters — a separate trust category from local dealers. No KRA
+// PIN, no physical yard, and manually approved by you (only exporters
+// already known to you or your dealer network).
+export interface Exporter {
+  id: string;
+  auth_user_id?: string | null;
+  company_name: string;
+  country: string;
+  contact_whatsapp: string;
+  listing_quota: number; // starts at 2 (free), raised manually after payment
+  created_at: string;
+}
+
 export interface TransitVehicle {
   id: string;
   dealer_id: string;

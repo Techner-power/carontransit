@@ -4,7 +4,7 @@ import { createServerSupabase } from "./supabase/serverClient";
 import { supabaseAdmin } from "./supabaseAdmin";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { TransitVehicle } from "./types";
+import { TransitVehicle, Exporter } from "./types";
 
 export interface ActionResult {
   success: boolean;
@@ -220,4 +220,40 @@ export async function addVehicle(formData: FormData): Promise<ActionResult> {
   revalidatePath("/transit");
   revalidatePath("/");
   return { success: true, message: `${vehicleTitle} added and live immediately.` };
+}
+
+export async function getExporters(): Promise<Exporter[]> {
+  const admin = await requireAdmin();
+  if (!admin || !supabaseAdmin) return [];
+
+  const { data } = await supabaseAdmin.from("exporters").select("*").order("company_name");
+  return (data as Exporter[]) ?? [];
+}
+
+// The only place an exporter's quota can change. Deliberately gated behind
+// requireAdmin() and using the service-role client — exporters themselves
+// have no update policy on their own row, so this is the sole path.
+export async function updateExporterQuota(formData: FormData): Promise<ActionResult> {
+  const admin = await requireAdmin();
+  if (!admin || !supabaseAdmin) {
+    return { success: false, message: "Not authorized." };
+  }
+
+  const exporterId = String(formData.get("exporterId") ?? "");
+  const quotaRaw = String(formData.get("quota") ?? "");
+  const quota = Number(quotaRaw);
+
+  if (!exporterId || !quota || quota < 0) {
+    return { success: false, message: "Invalid quota value." };
+  }
+
+  const { error } = await supabaseAdmin
+    .from("exporters")
+    .update({ listing_quota: quota })
+    .eq("id", exporterId);
+
+  if (error) return { success: false, message: error.message };
+
+  revalidatePath("/admin/dashboard");
+  return { success: true, message: "Quota updated." };
 }

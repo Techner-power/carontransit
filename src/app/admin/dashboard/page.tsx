@@ -3,6 +3,7 @@ import { createServerSupabase } from "@/lib/supabase/serverClient";
 import { getPendingVehicles, adminSignOut } from "@/lib/adminActions";
 import PendingVehicleRow from "@/components/PendingVehicleRow";
 import AdminManualEntryForms from "@/components/AdminManualEntryForms";
+import AdminExporterList from "@/components/AdminExporterList";
 
 function isAdminEmail(email: string | undefined): boolean {
   if (!email) return false;
@@ -49,6 +50,15 @@ export default async function AdminDashboardPage() {
             ))}
           </div>
         )}
+      </section>
+
+      <section className="mb-12">
+        <h2 className="text-lg font-bold mb-4">Exporters</h2>
+        <p className="text-sm text-port-steel mb-4">
+          Every account starts with a quota of 2 free listings. Raise it manually once you&apos;ve
+          confirmed payment directly with the exporter.
+        </p>
+        <AdminExporterList />
       </section>
 
       <section>
