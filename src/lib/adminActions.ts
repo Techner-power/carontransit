@@ -230,6 +230,25 @@ export async function getExporters(): Promise<Exporter[]> {
   return (data as Exporter[]) ?? [];
 }
 
+// The only way an exporter account becomes usable. Deliberately gated
+// behind requireAdmin() — exporters have no way to approve themselves.
+export async function approveExporter(exporterId: string): Promise<ActionResult> {
+  const admin = await requireAdmin();
+  if (!admin || !supabaseAdmin) {
+    return { success: false, message: "Not authorized." };
+  }
+
+  const { error } = await supabaseAdmin
+    .from("exporters")
+    .update({ is_approved: true })
+    .eq("id", exporterId);
+
+  if (error) return { success: false, message: error.message };
+
+  revalidatePath("/admin/dashboard");
+  return { success: true, message: "Exporter approved." };
+}
+
 // The only place an exporter's quota can change. Deliberately gated behind
 // requireAdmin() and using the service-role client — exporters themselves
 // have no update policy on their own row, so this is the sole path.

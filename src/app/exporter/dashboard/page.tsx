@@ -38,24 +38,36 @@ export default async function ExporterDashboardPage() {
         </form>
       </div>
 
-      <div className="bg-white border border-black/[0.12] rounded-xl p-6 mb-6">
-        <h2 className="text-sm font-bold mb-2">Your Listing Quota</h2>
-        <p className="text-3xl font-extrabold text-customs-amber-dark mb-1">
-          {exporter.listing_quota}
-        </p>
-        <p className="text-[13px] text-port-steel">
-          You can list up to {exporter.listing_quota} vehicles. Every new account starts with 2
-          free listings — contact us on WhatsApp to unlock up to 20.
-        </p>
-      </div>
+      {!exporter.is_approved ? (
+        <div className="bg-customs-amber/[0.1] border border-customs-amber/[0.4] rounded-xl p-6">
+          <h2 className="text-sm font-bold mb-2">Your account is awaiting approval</h2>
+          <p className="text-[13px] text-port-steel leading-relaxed">
+            We manually review every exporter account before it becomes active. This is usually
+            quick — reach out to us directly if it's been a while.
+          </p>
+        </div>
+      ) : (
+        <div className="bg-white border border-black/[0.12] rounded-xl p-6 mb-6">
+          <h2 className="text-sm font-bold mb-2">Your Listing Quota</h2>
+          <p className="text-3xl font-extrabold text-customs-amber-dark mb-1">
+            {exporter.listing_quota}
+          </p>
+          <p className="text-[13px] text-port-steel">
+            You can list up to {exporter.listing_quota} vehicles. Every new account starts with 2
+            free listings — contact us on WhatsApp to unlock up to 20.
+          </p>
+        </div>
+      )}
 
-      <div className="bg-manifest-cream-2 border border-black/[0.12] rounded-xl p-6">
-        <h2 className="text-sm font-bold mb-2">Listing management coming soon</h2>
-        <p className="text-[13px] text-port-steel leading-relaxed">
-          The ability to upload your vehicles directly is being finalized. In the meantime, send
-          your unit details to our team on WhatsApp and we&apos;ll get them listed for you.
-        </p>
-      </div>
+      {exporter.is_approved && (
+        <div className="bg-manifest-cream-2 border border-black/[0.12] rounded-xl p-6">
+          <h2 className="text-sm font-bold mb-2">Listing management coming soon</h2>
+          <p className="text-[13px] text-port-steel leading-relaxed">
+            The ability to upload your vehicles directly is being finalized. In the meantime, send
+            your unit details to our team on WhatsApp and we&apos;ll get them listed for you.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

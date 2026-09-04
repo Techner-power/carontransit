@@ -29,6 +29,7 @@ export interface Exporter {
   country: string;
   contact_whatsapp: string;
   listing_quota: number; // starts at 2 (free), raised manually after payment
+  is_approved: boolean; // must be manually approved by admin before it's usable
   created_at: string;
 }
 
