@@ -4,7 +4,7 @@ import { createServerSupabase } from "./supabase/serverClient";
 import { supabaseAdmin } from "./supabaseAdmin";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { TransitVehicle, Exporter } from "./types";
+import { TransitVehicle, Exporter, ForeignListing } from "./types";
 
 export interface ActionResult {
   success: boolean;
@@ -70,6 +70,81 @@ export async function getPendingVehicles(): Promise<TransitVehicle[]> {
     .order("created_at", { ascending: true });
 
   return (data as TransitVehicle[]) ?? [];
+}
+
+export type PendingItem =
+  | { kind: "local"; vehicle: TransitVehicle }
+  | { kind: "foreign"; listing: ForeignListing };
+
+// Combines local dealer submissions and foreign exporter submissions into
+// ONE queue, sorted oldest-first, so you check a single list rather than
+// two separate ones. Each item carries a "kind" tag so the UI can show the
+// Foreign badge clearly.
+export async function getPendingQueue(): Promise<PendingItem[]> {
+  const admin = await requireAdmin();
+  if (!admin || !supabaseAdmin) return [];
+
+  const [{ data: vehicles }, { data: listings }] = await Promise.all([
+    supabaseAdmin
+      .from("transit_inventory")
+      .select("*, dealer:dealerships(*)")
+      .eq("review_status", "Pending"),
+    supabaseAdmin
+      .from("foreign_listings")
+      .select("*, exporter:exporters(*)")
+      .eq("review_status", "Pending"),
+  ]);
+
+  const items: (PendingItem & { created_at: string })[] = [
+    ...((vehicles as TransitVehicle[]) ?? []).map((v) => ({
+      kind: "local" as const,
+      vehicle: v,
+      created_at: v.created_at,
+    })),
+    ...((listings as ForeignListing[]) ?? []).map((l) => ({
+      kind: "foreign" as const,
+      listing: l,
+      created_at: l.created_at,
+    })),
+  ];
+
+  items.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  return items;
+}
+
+export async function approveForeignListing(listingId: string): Promise<ActionResult> {
+  const admin = await requireAdmin();
+  if (!admin || !supabaseAdmin) {
+    return { success: false, message: "Not authorized." };
+  }
+
+  const { error } = await supabaseAdmin
+    .from("foreign_listings")
+    .update({ review_status: "Approved" })
+    .eq("id", listingId);
+
+  if (error) return { success: false, message: error.message };
+
+  revalidatePath("/admin/dashboard");
+  revalidatePath("/foreign");
+  return { success: true, message: "Listing approved and now live." };
+}
+
+export async function rejectForeignListing(listingId: string): Promise<ActionResult> {
+  const admin = await requireAdmin();
+  if (!admin || !supabaseAdmin) {
+    return { success: false, message: "Not authorized." };
+  }
+
+  const { error } = await supabaseAdmin
+    .from("foreign_listings")
+    .update({ review_status: "Rejected" })
+    .eq("id", listingId);
+
+  if (error) return { success: false, message: error.message };
+
+  revalidatePath("/admin/dashboard");
+  return { success: true, message: "Listing rejected." };
 }
 
 export async function approveVehicle(vehicleId: string): Promise<ActionResult> {

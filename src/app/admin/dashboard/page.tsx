@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase/serverClient";
-import { getPendingVehicles, adminSignOut } from "@/lib/adminActions";
+import { getPendingQueue, adminSignOut } from "@/lib/adminActions";
 import PendingVehicleRow from "@/components/PendingVehicleRow";
+import PendingForeignListingRow from "@/components/PendingForeignListingRow";
 import AdminManualEntryForms from "@/components/AdminManualEntryForms";
 import AdminExporterList from "@/components/AdminExporterList";
 
@@ -24,7 +25,7 @@ export default async function AdminDashboardPage() {
     redirect("/admin/login");
   }
 
-  const pendingVehicles = await getPendingVehicles();
+  const pendingQueue = await getPendingQueue();
 
   return (
     <div className="max-w-[1000px] mx-auto px-6 py-12">
@@ -39,15 +40,19 @@ export default async function AdminDashboardPage() {
 
       <section className="mb-12">
         <h2 className="text-lg font-bold mb-4">
-          Pending Review ({pendingVehicles.length})
+          Pending Review ({pendingQueue.length})
         </h2>
-        {pendingVehicles.length === 0 ? (
-          <p className="text-sm text-port-steel">No vehicles waiting for review right now.</p>
+        {pendingQueue.length === 0 ? (
+          <p className="text-sm text-port-steel">Nothing waiting for review right now.</p>
         ) : (
           <div className="space-y-3">
-            {pendingVehicles.map((v) => (
-              <PendingVehicleRow key={v.id} vehicle={v} />
-            ))}
+            {pendingQueue.map((item) =>
+              item.kind === "local" ? (
+                <PendingVehicleRow key={item.vehicle.id} vehicle={item.vehicle} />
+              ) : (
+                <PendingForeignListingRow key={item.listing.id} listing={item.listing} />
+              )
+            )}
           </div>
         )}
       </section>

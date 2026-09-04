@@ -33,6 +33,21 @@ export interface Exporter {
   created_at: string;
 }
 
+export interface ForeignListing {
+  id: string;
+  exporter_id: string;
+  vehicle_title: string;
+  car_make: string;
+  car_model: string;
+  year_of_manufacture: number;
+  fob_price_kes: number;
+  vehicle_hero_image: string;
+  listing_status: ListingStatus;
+  review_status: ReviewStatus;
+  created_at: string;
+  exporter?: Exporter;
+}
+
 export interface TransitVehicle {
   id: string;
   dealer_id: string;

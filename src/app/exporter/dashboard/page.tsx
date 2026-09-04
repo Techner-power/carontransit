@@ -1,6 +1,13 @@
 import { redirect } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase/serverClient";
-import { getMyExporterProfile, exporterSignOut } from "@/lib/exporterActions";
+import { getMyExporterProfile, getMyForeignListings, exporterSignOut } from "@/lib/exporterActions";
+import ExporterVehicleForm from "@/components/ExporterVehicleForm";
+
+const statusColor: Record<string, string> = {
+  Pending: "bg-customs-amber/[0.15] text-customs-amber-dark",
+  Approved: "bg-verified-teal/[0.15] text-verified-teal",
+  Rejected: "bg-red-100 text-red-600",
+};
 
 export default async function ExporterDashboardPage() {
   const supabase = await createServerSupabase();
@@ -24,8 +31,10 @@ export default async function ExporterDashboardPage() {
     );
   }
 
+  const listings = exporter.is_approved ? await getMyForeignListings() : [];
+
   return (
-    <div className="max-w-[720px] mx-auto px-6 py-12">
+    <div className="max-w-[860px] mx-auto px-6 py-12">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-extrabold">{exporter.company_name}</h1>
@@ -47,26 +56,57 @@ export default async function ExporterDashboardPage() {
           </p>
         </div>
       ) : (
-        <div className="bg-white border border-black/[0.12] rounded-xl p-6 mb-6">
-          <h2 className="text-sm font-bold mb-2">Your Listing Quota</h2>
-          <p className="text-3xl font-extrabold text-customs-amber-dark mb-1">
-            {exporter.listing_quota}
-          </p>
-          <p className="text-[13px] text-port-steel">
-            You can list up to {exporter.listing_quota} vehicles. Every new account starts with 2
-            free listings — contact us on WhatsApp to unlock up to 20.
-          </p>
-        </div>
-      )}
+        <>
+          <div className="bg-white border border-black/[0.12] rounded-xl p-6 mb-8">
+            <h2 className="text-sm font-bold mb-2">Your Listing Quota</h2>
+            <p className="text-3xl font-extrabold text-customs-amber-dark mb-1">
+              {listings.length} / {exporter.listing_quota}
+            </p>
+            <p className="text-[13px] text-port-steel">
+              Listings used out of your quota. Contact us on WhatsApp to unlock more.
+            </p>
+          </div>
 
-      {exporter.is_approved && (
-        <div className="bg-manifest-cream-2 border border-black/[0.12] rounded-xl p-6">
-          <h2 className="text-sm font-bold mb-2">Listing management coming soon</h2>
-          <p className="text-[13px] text-port-steel leading-relaxed">
-            The ability to upload your vehicles directly is being finalized. In the meantime, send
-            your unit details to our team on WhatsApp and we&apos;ll get them listed for you.
-          </p>
-        </div>
+          <section className="bg-white border border-black/[0.12] rounded-xl p-6 mb-8">
+            <h2 className="text-lg font-bold mb-4">Add a Vehicle</h2>
+            <p className="text-[13px] text-port-steel mb-4">
+              New listings are reviewed before appearing publicly — usually within 24 hours.
+            </p>
+            <ExporterVehicleForm />
+          </section>
+
+          <section>
+            <h2 className="text-lg font-bold mb-4">Your Listings ({listings.length})</h2>
+            {listings.length === 0 ? (
+              <p className="text-sm text-port-steel">
+                You haven&apos;t added any vehicles yet — use the form above.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {listings.map((l) => (
+                  <div
+                    key={l.id}
+                    className="bg-white border border-black/[0.12] rounded-xl p-4 flex items-center justify-between"
+                  >
+                    <div>
+                      <p className="font-bold text-sm">{l.vehicle_title}</p>
+                      <p className="text-[12px] text-port-steel font-mono">
+                        FOB KES {Number(l.fob_price_kes).toLocaleString()}
+                      </p>
+                    </div>
+                    <span
+                      className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${
+                        statusColor[l.review_status] ?? ""
+                      }`}
+                    >
+                      {l.review_status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        </>
       )}
     </div>
   );
