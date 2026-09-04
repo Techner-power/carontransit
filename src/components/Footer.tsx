@@ -17,6 +17,8 @@ export default function Footer() {
           <Link href="/verify">Verify a Listing</Link>
           <Link href="/for-dealers">For Dealers</Link>
           <Link href="/dealer/login">Dealer Login</Link>
+          <Link href="/exporter/signup">List as Exporter</Link>
+          <Link href="/exporter/login">Exporter Login</Link>
           <Link href="/duty-guide">Duty Guide</Link>
           <Link href="/about">About</Link>
           <Link href="/legal">Legal</Link>
