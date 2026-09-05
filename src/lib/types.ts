@@ -46,6 +46,9 @@ export interface ForeignListing {
   review_status: ReviewStatus;
   created_at: string;
   exporter?: Exporter;
+  // Computed at query time from the claims table, not a real database
+  // column — true if a live (unexpired, Pending) claim exists.
+  is_claimed?: boolean;
 }
 
 export interface TransitVehicle {

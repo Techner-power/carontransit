@@ -15,6 +15,11 @@ export default function ForeignListingCard({ listing }: { listing: ForeignListin
           <span className="absolute top-3 left-3 bg-ink-navy text-manifest-cream text-[10px] font-extrabold px-2.5 py-1 rounded uppercase tracking-wide">
             🌍 Foreign — Not Yet Shipped
           </span>
+          {listing.is_claimed && (
+            <span className="absolute top-3 right-3 bg-port-steel text-white text-[10px] font-extrabold px-2.5 py-1 rounded uppercase tracking-wide">
+              Requested
+            </span>
+          )}
         </div>
       </Link>
 

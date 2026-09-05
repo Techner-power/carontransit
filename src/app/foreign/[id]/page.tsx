@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { getForeignListingById } from "@/lib/foreignQueries";
 import { getVesselsDockingThisWeek, getVerifiedDealerCount } from "@/lib/queries";
 import { ADMIN_WHATSAPP_NUMBER } from "@/lib/constants";
+import RequestForeignCarButton from "@/components/RequestForeignCarButton";
 
 const STEPS = [
   {
@@ -131,14 +132,11 @@ export default async function ForeignListingDetail({
               </p>
             </div>
 
-            <a
-              href={whatsappLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full bg-[#25D366] hover:bg-[#1ebd55] text-white font-bold text-sm py-4 rounded-xl shadow flex items-center justify-center gap-2"
-            >
-              Request This Car & Get an Agent
-            </a>
+            <RequestForeignCarButton
+              listingId={listing.id}
+              whatsappLink={whatsappLink}
+              initialIsClaimed={Boolean(listing.is_claimed)}
+            />
           </div>
         </div>
       </div>
