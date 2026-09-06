@@ -209,3 +209,44 @@ export async function exporterAddForeignListing(formData: FormData): Promise<Act
     message: "Listing submitted for review. It will appear once approved.",
   };
 }
+
+// Lets an exporter replace their uploaded legal document. Same pattern as
+// the dealer version: service-role client, but only ever writes
+// legal_document_path on the exact row we've confirmed is theirs.
+export async function exporterUpdateDocument(formData: FormData): Promise<ActionResult> {
+  const supabase = await createServerSupabase();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, message: "You must be logged in." };
+  }
+
+  const legalDocumentPath = String(formData.get("legalDocumentPath") ?? "").trim();
+  if (!legalDocumentPath) {
+    return { success: false, message: "Please choose a file to upload first." };
+  }
+
+  const { data: exporterRow } = await supabase
+    .from("exporters")
+    .select("id")
+    .eq("auth_user_id", user.id)
+    .single();
+
+  if (!exporterRow) {
+    return { success: false, message: "No exporter profile found for this account." };
+  }
+
+  const { error } = await supabaseAdmin!
+    .from("exporters")
+    .update({ legal_document_path: legalDocumentPath })
+    .eq("id", exporterRow.id);
+
+  if (error) {
+    return { success: false, message: `Could not update document: ${error.message}` };
+  }
+
+  revalidatePath("/exporter/dashboard");
+  return { success: true, message: "Document updated successfully." };
+}

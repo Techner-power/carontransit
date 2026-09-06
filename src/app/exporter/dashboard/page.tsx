@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase/serverClient";
-import { getMyExporterProfile, getMyForeignListings, exporterSignOut } from "@/lib/exporterActions";
+import { getMyExporterProfile, getMyForeignListings, exporterSignOut, exporterUpdateDocument } from "@/lib/exporterActions";
 import ExporterVehicleForm from "@/components/ExporterVehicleForm";
+import UpdateDocumentForm from "@/components/UpdateDocumentForm";
 
 const statusColor: Record<string, string> = {
   Pending: "bg-customs-amber/[0.15] text-customs-amber-dark",
@@ -46,6 +47,11 @@ export default async function ExporterDashboardPage() {
           </button>
         </form>
       </div>
+
+      <UpdateDocumentForm
+        hasDocument={Boolean(exporter.legal_document_path)}
+        updateAction={exporterUpdateDocument}
+      />
 
       {!exporter.is_approved ? (
         <div className="bg-customs-amber/[0.1] border border-customs-amber/[0.4] rounded-xl p-6">

@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase/serverClient";
-import { getMyDealerProfile, getMyVehicles, dealerSignOut } from "@/lib/dealerActions";
+import { getMyDealerProfile, getMyVehicles, dealerSignOut, dealerUpdateDocument } from "@/lib/dealerActions";
 import DealerVehicleForm from "@/components/DealerVehicleForm";
 import DealerVehicleRow from "@/components/DealerVehicleRow";
+import UpdateDocumentForm from "@/components/UpdateDocumentForm";
 
 export default async function DealerDashboardPage() {
   const supabase = await createServerSupabase();
@@ -39,6 +40,11 @@ export default async function DealerDashboardPage() {
           </button>
         </form>
       </div>
+
+      <UpdateDocumentForm
+        hasDocument={Boolean(dealer.legal_document_path)}
+        updateAction={dealerUpdateDocument}
+      />
 
       <section className="bg-white border border-black/[0.12] rounded-xl p-6 mb-8">
         <h2 className="text-lg font-bold mb-4">Add a Vehicle</h2>

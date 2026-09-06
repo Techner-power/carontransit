@@ -377,3 +377,45 @@ export async function dealerEditVehicle(formData: FormData): Promise<ActionResul
     message: "Changes saved. This listing is now pending re-approval before it's public again.",
   };
 }
+
+// Lets a dealer replace their uploaded legal document — the fix for a
+// wrong upload or an expired certificate. Uses the service-role client but
+// only ever touches legal_document_path on the row we've just confirmed
+// belongs to this exact logged-in dealer, never anything else.
+export async function dealerUpdateDocument(formData: FormData): Promise<ActionResult> {
+  const supabase = await createServerSupabase();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, message: "You must be logged in." };
+  }
+
+  const legalDocumentPath = String(formData.get("legalDocumentPath") ?? "").trim();
+  if (!legalDocumentPath) {
+    return { success: false, message: "Please choose a file to upload first." };
+  }
+
+  const { data: dealerRow } = await supabase
+    .from("dealerships")
+    .select("id")
+    .eq("auth_user_id", user.id)
+    .single();
+
+  if (!dealerRow) {
+    return { success: false, message: "No dealer profile found for this account." };
+  }
+
+  const { error } = await supabaseAdmin!
+    .from("dealerships")
+    .update({ legal_document_path: legalDocumentPath })
+    .eq("id", dealerRow.id);
+
+  if (error) {
+    return { success: false, message: `Could not update document: ${error.message}` };
+  }
+
+  revalidatePath("/dealer/dashboard");
+  return { success: true, message: "Document updated successfully." };
+}
