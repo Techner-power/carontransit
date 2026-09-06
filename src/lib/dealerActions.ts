@@ -18,9 +18,16 @@ export async function dealerSignUp(formData: FormData): Promise<ActionResult> {
   const location = String(formData.get("location") ?? "").trim();
   const kraPin = String(formData.get("kraPin") ?? "").trim();
   const whatsapp = String(formData.get("whatsapp") ?? "").trim();
+  const legalDocumentPath = String(formData.get("legalDocumentPath") ?? "").trim();
 
   if (!email || !password || !businessName || !location || !kraPin || !whatsapp) {
     return { success: false, message: "All fields are required." };
+  }
+  if (!legalDocumentPath) {
+    return {
+      success: false,
+      message: "Please upload a business registration or KRA PIN certificate before submitting.",
+    };
   }
   if (!/^254\d{9}$/.test(whatsapp)) {
     return {
@@ -57,6 +64,11 @@ export async function dealerSignUp(formData: FormData): Promise<ActionResult> {
     physical_location: location,
     kra_pin: kraPin,
     whatsapp_contact: whatsapp,
+    legal_document_path: legalDocumentPath,
+    email,
+    // is_approved defaults to false in the database — kept as an
+    // informational marker for you to track which accounts you've
+    // reviewed; it does not restrict what a dealer can do.
   });
 
   if (dealerError) {

@@ -16,6 +16,9 @@ export interface Dealership {
   whatsapp_contact: string; // format 2547XXXXXXXX
   is_premium_partner: boolean;
   rating_score: number;
+  is_approved: boolean;
+  legal_document_path?: string | null;
+  email?: string | null;
   created_at: string;
 }
 
@@ -30,6 +33,8 @@ export interface Exporter {
   contact_whatsapp: string;
   listing_quota: number; // starts at 2 (free), raised manually after payment
   is_approved: boolean; // must be manually approved by admin before it's usable
+  legal_document_path?: string | null;
+  email?: string | null;
   created_at: string;
 }
 

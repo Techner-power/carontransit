@@ -4,7 +4,7 @@ import { createServerSupabase } from "./supabase/serverClient";
 import { supabaseAdmin } from "./supabaseAdmin";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { TransitVehicle, Exporter, ForeignListing } from "./types";
+import { TransitVehicle, Exporter, ForeignListing, Dealership } from "./types";
 
 export interface ActionResult {
   success: boolean;
@@ -295,6 +295,48 @@ export async function addVehicle(formData: FormData): Promise<ActionResult> {
   revalidatePath("/transit");
   revalidatePath("/");
   return { success: true, message: `${vehicleTitle} added and live immediately.` };
+}
+
+export async function getDealers(): Promise<Dealership[]> {
+  const admin = await requireAdmin();
+  if (!admin || !supabaseAdmin) return [];
+
+  const { data } = await supabaseAdmin.from("dealerships").select("*").order("business_name");
+  return (data as Dealership[]) ?? [];
+}
+
+export async function approveDealer(dealerId: string): Promise<ActionResult> {
+  const admin = await requireAdmin();
+  if (!admin || !supabaseAdmin) {
+    return { success: false, message: "Not authorized." };
+  }
+
+  const { error } = await supabaseAdmin
+    .from("dealerships")
+    .update({ is_approved: true })
+    .eq("id", dealerId);
+
+  if (error) return { success: false, message: error.message };
+
+  revalidatePath("/admin/dashboard");
+  return { success: true, message: "Dealer approved." };
+}
+
+// Generates a temporary, expiring link to a private legal document — this
+// is the only way anyone can ever view these files, since the storage
+// bucket itself has no public read access. The link stops working after
+// 60 seconds, so it's not something that could be forwarded or leaked
+// usefully.
+export async function getSignedDocumentUrl(path: string): Promise<string | null> {
+  const admin = await requireAdmin();
+  if (!admin || !supabaseAdmin || !path) return null;
+
+  const { data, error } = await supabaseAdmin.storage
+    .from("documents")
+    .createSignedUrl(path, 60);
+
+  if (error || !data) return null;
+  return data.signedUrl;
 }
 
 export async function getExporters(): Promise<Exporter[]> {

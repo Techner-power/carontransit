@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { getExporters, updateExporterQuota, approveExporter, ActionResult } from "@/lib/adminActions";
+import { getExporters, updateExporterQuota, approveExporter, getSignedDocumentUrl, ActionResult } from "@/lib/adminActions";
 import { Exporter } from "@/lib/types";
 
 export default function AdminExporterList() {
@@ -45,6 +45,27 @@ export default function AdminExporterList() {
     });
   };
 
+  const handleViewDocument = (exporterId: string, path: string | undefined) => {
+    if (!path) {
+      setResults((prev) => ({
+        ...prev,
+        [exporterId]: { success: false, message: "No document on file." },
+      }));
+      return;
+    }
+    startTransition(async () => {
+      const url = await getSignedDocumentUrl(path);
+      if (url) {
+        window.open(url, "_blank", "noopener,noreferrer");
+      } else {
+        setResults((prev) => ({
+          ...prev,
+          [exporterId]: { success: false, message: "Could not open document." },
+        }));
+      }
+    });
+  };
+
   if (exporters.length === 0) {
     return <p className="text-sm text-port-steel">No exporter accounts yet.</p>;
   }
@@ -70,36 +91,46 @@ export default function AdminExporterList() {
               <p className="text-[12px] text-port-steel">
                 {e.country} · {e.contact_whatsapp}
               </p>
+              {e.email && <p className="text-[12px] text-port-steel">{e.email}</p>}
             </div>
 
-            {!e.is_approved ? (
+            <div className="flex items-center gap-2">
               <button
-                onClick={() => handleApprove(e.id)}
+                onClick={() => handleViewDocument(e.id, e.legal_document_path ?? undefined)}
                 disabled={isPending}
-                className="bg-verified-teal text-white text-xs font-bold px-3 py-2 rounded-lg disabled:opacity-50"
+                className="bg-manifest-cream-2 text-ink-navy text-xs font-bold px-3 py-2 rounded-lg border border-black/[0.1] disabled:opacity-50"
               >
-                Approve
+                View Document
               </button>
-            ) : (
-              <div className="flex items-center gap-2">
-                <label className="text-[12px] text-port-steel">Quota:</label>
-                <input
-                  type="number"
-                  value={quotaInputs[e.id] ?? ""}
-                  onChange={(ev) =>
-                    setQuotaInputs((prev) => ({ ...prev, [e.id]: ev.target.value }))
-                  }
-                  className="border border-black/[0.15] rounded-lg px-2 py-1.5 text-sm w-20"
-                />
+              {!e.is_approved ? (
                 <button
-                  onClick={() => handleUpdate(e.id)}
+                  onClick={() => handleApprove(e.id)}
                   disabled={isPending}
-                  className="bg-customs-amber text-ink-navy text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-50"
+                  className="bg-verified-teal text-white text-xs font-bold px-3 py-2 rounded-lg disabled:opacity-50"
                 >
-                  Update
+                  Approve
                 </button>
-              </div>
-            )}
+              ) : (
+                <>
+                  <label className="text-[12px] text-port-steel">Quota:</label>
+                  <input
+                    type="number"
+                    value={quotaInputs[e.id] ?? ""}
+                    onChange={(ev) =>
+                      setQuotaInputs((prev) => ({ ...prev, [e.id]: ev.target.value }))
+                    }
+                    className="border border-black/[0.15] rounded-lg px-2 py-1.5 text-sm w-20"
+                  />
+                  <button
+                    onClick={() => handleUpdate(e.id)}
+                    disabled={isPending}
+                    className="bg-customs-amber text-ink-navy text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-50"
+                  >
+                    Update
+                  </button>
+                </>
+              )}
+            </div>
           </div>
           {results[e.id] && (
             <p

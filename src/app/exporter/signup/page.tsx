@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { exporterSignUp } from "@/lib/exporterActions";
+import DocumentUploadField from "@/components/DocumentUploadField";
 
 export default function ExporterSignupPage() {
   const [error, setError] = useState<string | null>(null);
@@ -59,6 +60,7 @@ export default function ExporterSignupPage() {
           placeholder="Password (min 8 characters)"
           className="border border-black/[0.15] rounded-lg px-3 py-2.5 text-sm w-full"
         />
+        <DocumentUploadField label="Business Registration Certificate" />
         <button
           type="submit"
           disabled={isPending}

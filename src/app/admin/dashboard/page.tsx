@@ -5,6 +5,7 @@ import PendingVehicleRow from "@/components/PendingVehicleRow";
 import PendingForeignListingRow from "@/components/PendingForeignListingRow";
 import AdminManualEntryForms from "@/components/AdminManualEntryForms";
 import AdminExporterList from "@/components/AdminExporterList";
+import AdminDealerList from "@/components/AdminDealerList";
 
 function isAdminEmail(email: string | undefined): boolean {
   if (!email) return false;
@@ -55,6 +56,15 @@ export default async function AdminDashboardPage() {
             )}
           </div>
         )}
+      </section>
+
+      <section className="mb-12">
+        <h2 className="text-lg font-bold mb-4">Dealers</h2>
+        <p className="text-sm text-port-steel mb-4">
+          Every signup shows full details and their uploaded legal document — check both before
+          relying on their listings.
+        </p>
+        <AdminDealerList />
       </section>
 
       <section className="mb-12">

@@ -16,9 +16,16 @@ export async function exporterSignUp(formData: FormData): Promise<ActionResult> 
   const companyName = String(formData.get("companyName") ?? "").trim();
   const country = String(formData.get("country") ?? "").trim();
   const whatsapp = String(formData.get("whatsapp") ?? "").trim();
+  const legalDocumentPath = String(formData.get("legalDocumentPath") ?? "").trim();
 
   if (!email || !password || !companyName || !country || !whatsapp) {
     return { success: false, message: "All fields are required." };
+  }
+  if (!legalDocumentPath) {
+    return {
+      success: false,
+      message: "Please upload a business registration document before submitting.",
+    };
   }
   if (password.length < 8) {
     return { success: false, message: "Password must be at least 8 characters." };
@@ -43,6 +50,8 @@ export async function exporterSignUp(formData: FormData): Promise<ActionResult> 
     company_name: companyName,
     country,
     contact_whatsapp: whatsapp,
+    legal_document_path: legalDocumentPath,
+    email,
     // listing_quota defaults to 2 in the database — not set here, so an
     // exporter can never influence their own starting quota via this form.
   });

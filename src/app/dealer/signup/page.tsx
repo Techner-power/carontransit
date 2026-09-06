@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { dealerSignUp } from "@/lib/dealerActions";
+import DocumentUploadField from "@/components/DocumentUploadField";
 
 export default function DealerSignupPage() {
   const [error, setError] = useState<string | null>(null);
@@ -64,6 +65,7 @@ export default function DealerSignupPage() {
           placeholder="Password (min 8 characters)"
           className="border border-black/[0.15] rounded-lg px-3 py-2.5 text-sm w-full"
         />
+        <DocumentUploadField label="Business Registration or KRA PIN Certificate" />
         <button
           type="submit"
           disabled={isPending}
