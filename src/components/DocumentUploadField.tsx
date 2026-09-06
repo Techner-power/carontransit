@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { createBrowserSupabase } from "@/lib/supabase/browserClient";
 
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB — matches the bucket's server-side limit
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+
 export default function DocumentUploadField({ label }: { label: string }) {
   const [fileName, setFileName] = useState<string | null>(null);
   const [filePath, setFilePath] = useState<string | null>(null);
@@ -14,6 +17,19 @@ export default function DocumentUploadField({ label }: { label: string }) {
     if (!file) return;
 
     setError(null);
+
+    // Checked here for a fast, clear error message — but the real
+    // enforcement is server-side on the bucket itself, so this can't be
+    // bypassed by editing the page or calling the upload API directly.
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setError("Please upload a JPG, PNG, WEBP, or PDF file.");
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      setError("File is too large — please keep it under 10MB.");
+      return;
+    }
+
     setIsUploading(true);
 
     const supabase = createBrowserSupabase();
@@ -38,7 +54,7 @@ export default function DocumentUploadField({ label }: { label: string }) {
       <label className="block text-[13px] font-semibold text-port-steel mb-1.5">{label}</label>
       <input
         type="file"
-        accept="image/*,.pdf"
+        accept="image/jpeg,image/png,image/webp,.pdf"
         onChange={handleFileChange}
         className="border border-black/[0.15] rounded-lg px-3 py-2.5 text-sm bg-white w-full"
       />

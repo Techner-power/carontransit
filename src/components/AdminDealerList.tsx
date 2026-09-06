@@ -67,6 +67,15 @@ export default function AdminDealerList() {
                 >
                   {d.is_approved ? "Approved" : "Pending Approval"}
                 </span>
+                <span
+                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    d.legal_document_path
+                      ? "bg-verified-teal/[0.15] text-verified-teal"
+                      : "bg-red-100 text-red-600"
+                  }`}
+                >
+                  {d.legal_document_path ? "Document ✓" : "No Document ⚠"}
+                </span>
               </div>
               <p className="text-[12px] text-port-steel">
                 {d.physical_location} · KRA {d.kra_pin} · {d.whatsapp_contact}
