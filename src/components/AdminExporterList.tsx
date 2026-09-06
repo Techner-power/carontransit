@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { getExporters, updateExporterQuota, approveExporter, getSignedDocumentUrl, ActionResult } from "@/lib/adminActions";
 import { Exporter } from "@/lib/types";
+import { UNLIMITED_QUOTA, formatQuota } from "@/lib/packages";
 
 export default function AdminExporterList() {
   const [exporters, setExporters] = useState<Exporter[]>([]);
@@ -33,10 +34,10 @@ export default function AdminExporterList() {
     });
   };
 
-  const handleUpdate = (exporterId: string) => {
+  const handleUpdate = (exporterId: string, quota?: number) => {
     const formData = new FormData();
     formData.set("exporterId", exporterId);
-    formData.set("quota", quotaInputs[exporterId] ?? "2");
+    formData.set("quota", String(quota ?? quotaInputs[exporterId] ?? "2"));
 
     startTransition(async () => {
       const result = await updateExporterQuota(formData);
@@ -121,7 +122,9 @@ export default function AdminExporterList() {
                 </button>
               ) : (
                 <>
-                  <label className="text-[12px] text-port-steel">Quota:</label>
+                  <label className="text-[12px] text-port-steel">
+                    Quota: {formatQuota(e.listing_quota)}
+                  </label>
                   <input
                     type="number"
                     value={quotaInputs[e.id] ?? ""}
@@ -136,6 +139,13 @@ export default function AdminExporterList() {
                     className="bg-customs-amber text-ink-navy text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-50"
                   >
                     Update
+                  </button>
+                  <button
+                    onClick={() => handleUpdate(e.id, UNLIMITED_QUOTA)}
+                    disabled={isPending}
+                    className="bg-manifest-cream-2 text-ink-navy text-xs font-bold px-3 py-1.5 rounded-lg border border-black/[0.1] disabled:opacity-50"
+                  >
+                    Set Unlimited
                   </button>
                 </>
               )}

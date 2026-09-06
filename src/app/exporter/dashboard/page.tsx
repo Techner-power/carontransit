@@ -3,6 +3,8 @@ import { createServerSupabase } from "@/lib/supabase/serverClient";
 import { getMyExporterProfile, getMyForeignListings, exporterSignOut, exporterUpdateDocument } from "@/lib/exporterActions";
 import ExporterVehicleForm from "@/components/ExporterVehicleForm";
 import UpdateDocumentForm from "@/components/UpdateDocumentForm";
+import PackagesSection from "@/components/PackagesSection";
+import { EXPORTER_PACKAGES, formatQuota } from "@/lib/packages";
 
 const statusColor: Record<string, string> = {
   Pending: "bg-customs-amber/[0.15] text-customs-amber-dark",
@@ -53,6 +55,12 @@ export default async function ExporterDashboardPage() {
         updateAction={exporterUpdateDocument}
       />
 
+      <PackagesSection
+        packages={EXPORTER_PACKAGES}
+        currentQuota={exporter.listing_quota}
+        accountName={exporter.company_name}
+      />
+
       {!exporter.is_approved ? (
         <div className="bg-customs-amber/[0.1] border border-customs-amber/[0.4] rounded-xl p-6">
           <h2 className="text-sm font-bold mb-2">Your account is awaiting approval</h2>
@@ -66,10 +74,10 @@ export default async function ExporterDashboardPage() {
           <div className="bg-white border border-black/[0.12] rounded-xl p-6 mb-8">
             <h2 className="text-sm font-bold mb-2">Your Listing Quota</h2>
             <p className="text-3xl font-extrabold text-customs-amber-dark mb-1">
-              {listings.length} / {exporter.listing_quota}
+              {listings.length} / {formatQuota(exporter.listing_quota)}
             </p>
             <p className="text-[13px] text-port-steel">
-              Listings used out of your quota. Contact us on WhatsApp to unlock more.
+              Listings used out of your quota. See the Packages section above to upgrade.
             </p>
           </div>
 

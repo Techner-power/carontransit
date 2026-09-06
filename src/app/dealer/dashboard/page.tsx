@@ -4,6 +4,8 @@ import { getMyDealerProfile, getMyVehicles, dealerSignOut, dealerUpdateDocument 
 import DealerVehicleForm from "@/components/DealerVehicleForm";
 import DealerVehicleRow from "@/components/DealerVehicleRow";
 import UpdateDocumentForm from "@/components/UpdateDocumentForm";
+import PackagesSection from "@/components/PackagesSection";
+import { DEALER_PACKAGES, formatQuota } from "@/lib/packages";
 
 export default async function DealerDashboardPage() {
   const supabase = await createServerSupabase();
@@ -44,6 +46,22 @@ export default async function DealerDashboardPage() {
       <UpdateDocumentForm
         hasDocument={Boolean(dealer.legal_document_path)}
         updateAction={dealerUpdateDocument}
+      />
+
+      <div className="bg-white border border-black/[0.12] rounded-xl p-6 mb-8">
+        <h2 className="text-sm font-bold mb-2">Your Listing Quota</h2>
+        <p className="text-3xl font-extrabold text-customs-amber-dark mb-1">
+          {vehicles.length} / {formatQuota(dealer.listing_quota)}
+        </p>
+        <p className="text-[13px] text-port-steel">
+          Listings used out of your quota. See the Packages section below to upgrade.
+        </p>
+      </div>
+
+      <PackagesSection
+        packages={DEALER_PACKAGES}
+        currentQuota={dealer.listing_quota}
+        accountName={dealer.business_name}
       />
 
       <section className="bg-white border border-black/[0.12] rounded-xl p-6 mb-8">

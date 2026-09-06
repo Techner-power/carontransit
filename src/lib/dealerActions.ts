@@ -116,12 +116,24 @@ export async function dealerAddVehicle(formData: FormData): Promise<ActionResult
 
   const { data: dealerRow } = await supabase
     .from("dealerships")
-    .select("id")
+    .select("id, listing_quota")
     .eq("auth_user_id", user.id)
     .single();
 
   if (!dealerRow) {
     return { success: false, message: "No dealer profile found for this account." };
+  }
+
+  const { count } = await supabase
+    .from("transit_inventory")
+    .select("*", { count: "exact", head: true })
+    .eq("dealer_id", dealerRow.id);
+
+  if ((count ?? 0) >= dealerRow.listing_quota) {
+    return {
+      success: false,
+      message: `You've used all ${dealerRow.listing_quota} of your listing slots. Check the Packages section below to upgrade.`,
+    };
   }
 
   const vehicleTitle = String(formData.get("vehicleTitle") ?? "").trim();

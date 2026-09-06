@@ -19,6 +19,7 @@ export interface Dealership {
   is_approved: boolean;
   legal_document_path?: string | null;
   email?: string | null;
+  listing_quota: number;
   created_at: string;
 }
 

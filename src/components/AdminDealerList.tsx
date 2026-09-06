@@ -1,16 +1,25 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { getDealers, approveDealer, getSignedDocumentUrl, ActionResult } from "@/lib/adminActions";
+import { getDealers, approveDealer, updateDealerQuota, getSignedDocumentUrl, ActionResult } from "@/lib/adminActions";
 import { Dealership } from "@/lib/types";
+import { UNLIMITED_QUOTA, formatQuota } from "@/lib/packages";
 
 export default function AdminDealerList() {
   const [dealers, setDealers] = useState<Dealership[]>([]);
+  const [quotaInputs, setQuotaInputs] = useState<Record<string, string>>({});
   const [results, setResults] = useState<Record<string, ActionResult>>({});
   const [isPending, startTransition] = useTransition();
 
   const refresh = () => {
-    getDealers().then(setDealers);
+    getDealers().then((data) => {
+      setDealers(data);
+      const initial: Record<string, string> = {};
+      data.forEach((d) => {
+        initial[d.id] = String(d.listing_quota);
+      });
+      setQuotaInputs(initial);
+    });
   };
 
   useEffect(() => {
@@ -20,6 +29,18 @@ export default function AdminDealerList() {
   const handleApprove = (dealerId: string) => {
     startTransition(async () => {
       const result = await approveDealer(dealerId);
+      setResults((prev) => ({ ...prev, [dealerId]: result }));
+      if (result.success) refresh();
+    });
+  };
+
+  const handleUpdateQuota = (dealerId: string, quota?: number) => {
+    const formData = new FormData();
+    formData.set("dealerId", dealerId);
+    formData.set("quota", String(quota ?? quotaInputs[dealerId] ?? "2"));
+
+    startTransition(async () => {
+      const result = await updateDealerQuota(formData);
       setResults((prev) => ({ ...prev, [dealerId]: result }));
       if (result.success) refresh();
     });
@@ -83,7 +104,7 @@ export default function AdminDealerList() {
               {d.email && <p className="text-[12px] text-port-steel">{d.email}</p>}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={() => handleViewDocument(d.id, d.legal_document_path ?? undefined)}
                 disabled={isPending}
@@ -100,6 +121,31 @@ export default function AdminDealerList() {
                   Approve
                 </button>
               )}
+              <label className="text-[12px] text-port-steel">
+                Quota: {formatQuota(d.listing_quota)}
+              </label>
+              <input
+                type="number"
+                value={quotaInputs[d.id] ?? ""}
+                onChange={(ev) =>
+                  setQuotaInputs((prev) => ({ ...prev, [d.id]: ev.target.value }))
+                }
+                className="border border-black/[0.15] rounded-lg px-2 py-1.5 text-sm w-20"
+              />
+              <button
+                onClick={() => handleUpdateQuota(d.id)}
+                disabled={isPending}
+                className="bg-customs-amber text-ink-navy text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-50"
+              >
+                Update
+              </button>
+              <button
+                onClick={() => handleUpdateQuota(d.id, UNLIMITED_QUOTA)}
+                disabled={isPending}
+                className="bg-manifest-cream-2 text-ink-navy text-xs font-bold px-3 py-1.5 rounded-lg border border-black/[0.1] disabled:opacity-50"
+              >
+                Set Unlimited
+              </button>
             </div>
           </div>
           {results[d.id] && (

@@ -322,6 +322,33 @@ export async function approveDealer(dealerId: string): Promise<ActionResult> {
   return { success: true, message: "Dealer approved." };
 }
 
+// Only path a dealer's quota can ever change — no self-service update
+// exists on their own row for this field.
+export async function updateDealerQuota(formData: FormData): Promise<ActionResult> {
+  const admin = await requireAdmin();
+  if (!admin || !supabaseAdmin) {
+    return { success: false, message: "Not authorized." };
+  }
+
+  const dealerId = String(formData.get("dealerId") ?? "");
+  const quotaRaw = String(formData.get("quota") ?? "");
+  const quota = Number(quotaRaw);
+
+  if (!dealerId || !quota || quota < 0) {
+    return { success: false, message: "Invalid quota value." };
+  }
+
+  const { error } = await supabaseAdmin
+    .from("dealerships")
+    .update({ listing_quota: quota })
+    .eq("id", dealerId);
+
+  if (error) return { success: false, message: error.message };
+
+  revalidatePath("/admin/dashboard");
+  return { success: true, message: "Quota updated." };
+}
+
 // Generates a temporary, expiring link to a private legal document — this
 // is the only way anyone can ever view these files, since the storage
 // bucket itself has no public read access. The link stops working after
